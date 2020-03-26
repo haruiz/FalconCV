@@ -1,0 +1,50 @@
+site_name: FalconCV
+repo_name: haruiz/FhalconCV
+repo_url: https://github.com/haruiz/FhalconCV
+docs_dir: mkdocs
+site_dir: docs
+nav:
+    - Home: index.md
+    - Datasets: datasets.md
+    - Models: models.md
+theme:
+  name: 'material'
+  logo: "images/logo.png"
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+extra:
+  search:
+    language: en
+  social:
+    - type: github
+      link: https://github.com/haruiz
+    - type: twitter
+      link: https://twitter.com/devharuiz
+    - type: linkedin
+      link: https://www.linkedin.com/in/haruiz/
+
+markdown_extensions:
+  - footnotes
+  - admonition
+  - codehilite:
+      linenums: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:pymdownx.emoji.twemoji
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search

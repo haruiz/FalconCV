@@ -1,0 +1,1 @@
+from .type_assert_decor import typeassert
