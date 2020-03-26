@@ -1,6 +1,6 @@
 site_name: FalconCV
-repo_name: haruiz/FhalconCV
-repo_url: https://github.com/haruiz/FhalconCV
+repo_name: haruiz/FalconCV
+repo_url: https://github.com/haruiz/FalconCV
 docs_dir: mkdocs
 site_dir: docs
 nav:
