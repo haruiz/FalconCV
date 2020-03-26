@@ -92,12 +92,12 @@ class TfTrainableModel(ApiModel):
                     epochs
                 )
                 Utilities.save_pipeline(pipeline,self._out_folder)
+            os.makedirs(os.path.join(self._out_folder, "export/Servo"), exist_ok=True)
             # training
             tf.logging.set_verbosity(tf.logging.INFO)
             device_name=tf.test.gpu_device_name()
             if device_name != '/device:GPU:0':
                 session_config=tf.ConfigProto()
-                session_config.gpu_options.allow_growth=True
                 config=tf.estimator.RunConfig(
                     model_dir=self._out_folder)
             else:
@@ -123,7 +123,6 @@ class TfTrainableModel(ApiModel):
             train_spec,eval_specs=model_lib.create_train_and_eval_specs(
                 train_input_fn,
                 eval_input_fns,
-
                 eval_on_train_input_fn,
                 predict_input_fn,
                 train_steps,
