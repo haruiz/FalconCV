@@ -39,6 +39,22 @@ class ApiInstaller(metaclass=ABCMeta):
         self._repo_uri=None
         self._repo_folder = None
 
+    @property
+    def repo_uri(self):
+        return self._repo_uri
+
+    @repo_uri.setter
+    def repo_uri(self, value):
+        self._repo_uri = value
+
+    @property
+    def repo_folder(self):
+        return self._repo_folder
+
+    @repo_folder.setter
+    def repo_folder(self, value):
+        self._repo_folder = value
+
     @staticmethod
     def get_repo_name_from_url(url: str) -> str:
         last_slash_index=url.rfind("/")
@@ -46,7 +62,7 @@ class ApiInstaller(metaclass=ABCMeta):
         if last_suffix_index < 0:
             last_suffix_index=len(url)
         if last_slash_index < 0 or last_suffix_index <= last_slash_index:
-            raise Exception("Badly formatted url {}".format(url))
+            raise Exception("invalid url format {}".format(url))
         return url[last_slash_index+1:last_suffix_index]
 
     def _clone_repo(self):

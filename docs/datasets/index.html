@@ -318,7 +318,7 @@
         <span class="c1"># access to the regions</span>
         <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">batch_images</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">img</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">shape_attributes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">region</span><span class="o">.</span><span class="n">shape_attributes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">shape_attributes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">region</span><span class="o">.</span><span class="n">shape_attributes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
 </code></pre></div>
 </td></tr></table>
 
@@ -357,7 +357,7 @@
         <span class="c1"># access to the regions</span>
         <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">batch_images</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">img</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">shape_attributes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">region</span><span class="o">.</span><span class="n">shape_attributes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">shape_attributes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">region</span><span class="o">.</span><span class="n">shape_attributes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
 </code></pre></div>
 </td></tr></table>
 
@@ -390,7 +390,7 @@
     <span class="k">for</span> <span class="n">images_batch</span> <span class="ow">in</span> <span class="n">scrapper</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="s2">&quot;cockroach&quot;</span><span class="p">,</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">80</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images_batch</span><span class="p">:</span>
             <span class="c1"># copy the images to the disk or do whatever you want</span>
-            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_folder</span><span class="p">,</span> <span class="s2">&quot;{}.jpg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))),</span> <span class="n">img</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_folder</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.jpg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))),</span> <span class="n">img</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
 
@@ -421,7 +421,7 @@
     <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">scrapper</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cockroach&quot;</span><span class="p">],</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">80</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
             <span class="c1"># copy the images to the disk or do whatever you want</span>
-            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_folder</span><span class="p">,</span><span class="s2">&quot;{}.jpg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))),</span><span class="n">img</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_folder</span><span class="p">,</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.jpg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))),</span><span class="n">img</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
 

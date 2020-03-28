@@ -5,7 +5,10 @@ from falconcv.models import ApiInstaller
 import importlib.util
 import logging
 import sys
+from subprocess import call
 logger=logging.getLogger(__name__)
+
+
 
 class  TFObjectDetectionAPI(ApiInstaller):
     def __init__(self):
@@ -18,7 +21,8 @@ class  TFObjectDetectionAPI(ApiInstaller):
             super(TFObjectDetectionAPI, self).install()
             self._protobuf_comp()
             if importlib.util.find_spec(self._package_name) is None:
-                os.system("python {}/research/setup.py install".format(self._repo_folder))
+                call("python setup.py build", cwd=os.path.join(self.repo_folder, "research"))
+                call("python setup.py install", cwd=os.path.join(self.repo_folder, "research"))
             research_folder_path = os.path.sep.join([self._repo_folder,"research"])
             slim_folder_path = os.path.sep.join([self._repo_folder,"research","slim"])
             sys.path.append(research_folder_path)
@@ -50,7 +54,5 @@ class  TFObjectDetectionAPI(ApiInstaller):
             if output:
                 print(output)
             p.wait()
-
-
 
 

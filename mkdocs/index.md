@@ -19,7 +19,7 @@ FalconCV is an open-source python library that offers developers an interface to
 1. Download and install Anaconda (Python 3+).
 2. Open the anaconda terminal and execute:
 ```console
- conda create --name falconcv python=3.7
+ conda create --name falconcv python=3.6
 ```
 
 ### Installing the dependencies
@@ -28,6 +28,7 @@ pip install matplotlib
 pip install numpy
 pip install opencv-contrib-python
 pip install pillow
+pip install cython
 pip install tqdm
 pip install scipy
 pip install requests 
@@ -38,6 +39,7 @@ pip install pandas
 pip install imutils
 pip install boto3
 pip install "dask[complete]" 
+pip install lxml
 pip install Mako
 pip install colorlog
 pip install bs4
@@ -45,6 +47,9 @@ pip install pick
 pip install -U scikit-learn
 pip install windows-curses
 pip install gitpython
+pip install cython
+pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI
+pip install tensorflow
 ```
 
 ### Install library

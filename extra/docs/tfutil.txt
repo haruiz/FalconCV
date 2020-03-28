@@ -1,0 +1,194 @@
+import glob
+import os
+import xml.etree.ElementTree as ET
+from itertools import cycle
+from urllib.parse import urlparse
+
+import cv2
+import markdown
+import matplotlib.pyplot as plt
+import pandas as pd
+from PIL import Image
+from bs4 import BeautifulSoup
+from lxml import objectify
+from matplotlib import patches
+from object_detection.utils.config_util import get_configs_from_pipeline_file
+import numpy as np
+
+class TFUtil:
+
+    @staticmethod
+    def load_xml_files(xml_annotations_dir,images_dir=None,out_file=None) -> pd.DataFrame:
+        xml_list=[]
+        files=glob.glob(xml_annotations_dir+'/*.xml')
+        for xml_file in files:
+            images_folder=images_dir if images_dir else os.path.dirname(xml_file)
+            tree=ET.parse(xml_file)
+            root=tree.getroot()
+            objects=root.findall('object')
+            for member in objects:
+                image_file_name=root.find('filename').text
+                image_file_path=os.path.join(images_folder,image_file_name)
+                if os.path.exists(image_file_path):
+                    value=(
+                        xml_file,
+                        image_file_path,
+                        int(root.find('size')[0].text),
+                        int(root.find('size')[1].text),
+                        member[0].text,
+                        int(member[4][0].text),
+                        int(member[4][1].text),
+                        int(member[4][2].text),
+                        int(member[4][3].text))
+                    xml_list.append(value)
+        column_names=['xml_path','image_path',"width",'height','class','xmin','ymin','xmax','ymax']
+        xml_df=pd.DataFrame(xml_list,columns=column_names)
+        if out_file:
+            xml_df.to_csv(out_file,index=None)
+        return xml_df
+
+    @staticmethod
+    def visualize_tagged_image(xml_path,aspect=40):
+        try:
+            with open(xml_path) as f:
+                xml=f.read()
+            font=cv2.FONT_HERSHEY_SIMPLEX
+            root=objectify.fromstring(xml)
+            file_name,_=os.path.splitext(xml_path)
+            img=cv2.imread("{}.jpg".format(file_name),cv2.IMREAD_COLOR)
+            img=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+            for item in root.object:
+                x=item.bndbox.xmin
+                y=item.bndbox.ymin
+                w=item.bndbox.xmax
+                h=item.bndbox.ymax
+                cv2.rectangle(img,(x,y),(w,h),(255,0,0),2)
+                cv2.putText(img,str(item.name),(x,h+20),font,1,(255,0,0),2,cv2.LINE_AA)
+            fig=plt.figure(figsize=(aspect,aspect))
+            plt.imshow(img)
+            plt.show()
+        except Exception as e:
+            print("Error reading the image {}".format(str(e)))
+
+    @classmethod
+    def visualize_tagged_image_boxes(cls,image_file,boxes):
+        palette=cycle('bgrcmk')
+        labels=np.unique([box.label for box in boxes])
+        colors={label: next(palette) for label in labels}
+        img=cv2.imread(image_file,cv2.IMREAD_COLOR)
+        rgb=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+        fig=plt.figure()
+        ax=fig.add_subplot(111,aspect='equal')
+        for i,box in enumerate(boxes):
+            label="{} :{:.2f}".format(box.label,box.score)
+            ax.add_patch(
+                patches.Rectangle(
+                    (box.x1,box.y1),
+                    box.x2-box.x1,
+                    box.y2-box.y1,
+                    linewidth=3,
+                    edgecolor=colors[box.label],
+                    facecolor='none',
+                    fill=False
+                ))
+            ax.text(
+                x=box.x1,
+                y=box.y1,
+                s=label,
+                color="white",
+                fontsize=12,
+                bbox=dict(boxstyle="round",facecolor=colors[box.label],alpha=0.9))
+            # ax.grid()
+        ax.imshow(rgb)
+        #plt.show()
+        # cv2.putText(rgb, label,(box.x1 + 10,box.y1 + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[box.label],2)
+        fig.savefig('result.png', dpi=90, bbox_inches='tight')
+
+    @staticmethod
+    def get_model_name(path_file) -> str:
+        try:
+            config=get_configs_from_pipeline_file(path_file)
+            model_config=config["model"]  # read Detection model
+            model_arch=model_config.WhichOneof("model")
+            model_name=None
+            if model_arch == "faster_rcnn":
+                model=model_config.faster_rcnn
+                model_name=model.feature_extractor.type
+            elif model_arch == "ssd":
+                model=model_config.ssd
+                model_name=model.feature_extractor.type
+            else:
+                raise NotImplementedError()
+            return model_name  # model extracted name from the config file
+        except Exception as exc:
+            print("Error reading the config file {}".format(exc))
+
+    @staticmethod
+    def get_config_lists() -> []:
+        try:
+            base_path=os.environ['TF_RESEARCH']
+            relative_path="object_detection/samples/configs"
+            configs_path=os.path.join(base_path,relative_path)
+            files=glob.glob(configs_path+'/*.config')
+            return files
+        except Exception as e:
+            print("Error reading models file {}".format(str(e)))
+
+    @staticmethod
+    def get_model_list() -> []:
+        try:
+            models=[]
+            base_path=os.environ['TF_RESEARCH']
+            relative_path="object_detection/g3doc/detection_model_zoo.md"
+            mardown_path=os.path.join(base_path,relative_path)
+            if os.path.exists(mardown_path) and os.path.isfile(mardown_path):
+                with open(mardown_path,'r') as file:
+                    content=file.read()
+                md=markdown.Markdown()
+                html=md.convert(content)
+                soup=BeautifulSoup(html,"lxml")
+                # print(soup.prettify())
+                for a in soup.find_all('a',href=True):
+                    url=a['href']
+                    path=urlparse(url).path
+                    ext=os.path.splitext(path)[1]
+                    if ext == ".gz":
+                        models.append(url)
+            return models
+        except Exception as e:
+            print("Error reading models file {}".format(str(e)))
+
+    @staticmethod
+    def multiarray_to_image(data):
+        data=np.squeeze(data)
+        data=(data*255).round()
+        img=data.astype(np.uint8)
+        return img
+
+    @staticmethod
+    def image_to_multiarray(image_path):
+        image=Image.open(image_path)
+        (im_width,im_height)=image.size
+        return np.array(image.getdata()).reshape((im_height,im_width,3)).astype(np.uint8)
+
+    @staticmethod
+    def read_and_scale_image(image_path,size=None):
+        rgb = cv2.imread(image_path,cv2.IMREAD_COLOR)
+        rgb = cv2.cvtColor(rgb,cv2.COLOR_BGR2RGB)
+        h, w, c = rgb.shape
+        scale = 1
+        if size:
+            scale = size/w
+            new_w, new_h = w*scale,h*scale
+            rgb = cv2.resize(rgb,(int(new_w,int(new_h))))
+        return rgb.astype(np.uint8),w,h,scale
+
+
+if __name__ == '__main__':
+    pass
+    # import requests
+    # url="https://github.com/tensorflow/models/tree/master/research/object_detection/samples/configs"
+    # r=requests.get(url)
+    # if r.status_code == 200:
+    #     print(r.text)
+    #print([model for model in  TFUtil.get_model_list() if "resnet" in model])
