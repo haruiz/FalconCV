@@ -1,12 +1,11 @@
 import glob
-import os
-import subprocess
-from falconcv.models import ApiInstaller
 import importlib.util
 import logging
+import os
+import subprocess
 import sys
-from subprocess import call
 
+from falconcv.models import ApiInstaller
 from falconcv.util import FileUtil
 
 logger=logging.getLogger(__name__)

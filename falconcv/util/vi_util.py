@@ -2,11 +2,13 @@ import math
 from io import BytesIO
 
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image,ImageColor
-import cv2
+from PIL import Image
+
+#from .color_util import ColorUtil
 from matplotlib import patches
-import matplotlib.pylab as plt
+
 from .color_util import ColorUtil
 
 
@@ -107,6 +109,7 @@ class VIUtil:
         #img = cls.fig2numpy(fig)
         #cls._imshow(img)
         plt.show()
+        #cv2.putText(rgb, label,(box.x1 + 10,box.y1 + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[box.label],2)
+        #fig.savefig('result_{}.png'.format(uuid.uuid4()), dpi=300, bbox_inches='tight')
         return fig
-        # cv2.putText(rgb, label,(box.x1 + 10,box.y1 + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[box.label],2)
-        # fig.savefig('result_{}.png'.format(uuid.uuid4()), dpi=300, bbox_inches='tight')
+

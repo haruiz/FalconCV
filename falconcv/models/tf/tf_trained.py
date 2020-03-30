@@ -6,7 +6,7 @@ import tensorflow as tf
 from object_detection.utils import ops as utils_ops
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
 from falconcv.decor import typeassert
-from falconcv.models.model_builder import ApiModel
+from falconcv.models.api_model import ApiModel
 from falconcv.models.tf.misc import BoundingBox
 from falconcv.models.tf.util import Utilities
 from falconcv.util import ImageUtil

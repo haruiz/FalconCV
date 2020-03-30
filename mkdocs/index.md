@@ -25,7 +25,7 @@ FalconCV is an open-source python library that offers developers an interface to
 ### Installing the dependencies
 ```console
 pip install matplotlib
-pip install numpy
+pip install numpy==1.17
 pip install opencv-contrib-python
 pip install pillow
 pip install cython
@@ -48,13 +48,13 @@ pip install pick
 pip install -U scikit-learn
 pip install gitpython
 pip install cython
-pip install tensorflow-gpu==1.15
+conda  install tensorflow-gpu==1.15.0
 ```
 
 ***windows***
 ```console
 pip install windows-curses
-pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI
+pip install pycocotools-win
 ```
 
 ***Linux***

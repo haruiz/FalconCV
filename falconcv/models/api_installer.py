@@ -1,16 +1,14 @@
+import logging
+import os
 from abc import abstractmethod, ABCMeta
 
-import validators
-from git import Repo, RemoteProgress
-import importlib
 import git
+import validators
 from clint.textui import progress
-
-import os
-import pkg_resources  # part of setuptools
+from git import Repo, RemoteProgress
 
 from falconcv.util import LibUtil
-import logging
+
 logger=logging.getLogger(__name__)
 
 
