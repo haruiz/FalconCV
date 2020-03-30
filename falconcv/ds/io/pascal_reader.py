@@ -3,11 +3,11 @@ import os
 import xml.etree.ElementTree as ET
 import pandas as pd
 from falconcv.util import Console
-
+from pathlib import Path
 
 def read_pascal_dataset(xml_folder, images_folder=None):
     xml_list=[]
-    files=glob.glob("{}/*.xml".format(xml_folder))
+    files = glob.glob("{}/**/*.xml".format(xml_folder), recursive=True)
     for xml_file in files:
         images_folder=images_folder if images_folder else os.path.dirname(xml_file)
         tree=ET.parse(xml_file)
@@ -30,3 +30,5 @@ def read_pascal_dataset(xml_folder, images_folder=None):
                 xml_list.append(value)
     column_names=['xml_path','image_path',"width",'height','class','xmin','ymin','xmax','ymax']
     return pd.DataFrame(xml_list,columns=column_names)
+
+
