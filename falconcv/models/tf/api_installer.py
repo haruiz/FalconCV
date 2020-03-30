@@ -6,6 +6,9 @@ import importlib.util
 import logging
 import sys
 from subprocess import call
+
+from falconcv.util import FileUtil
+
 logger=logging.getLogger(__name__)
 
 
@@ -20,9 +23,13 @@ class  TFObjectDetectionAPI(ApiInstaller):
         try:
             super(TFObjectDetectionAPI, self).install()
             self._protobuf_comp()
+            api_folder = os.path.sep.join(
+                [self._repo_folder,
+                 "research"])
             if importlib.util.find_spec(self._package_name) is None:
-                call("python setup.py build", cwd=os.path.join(self.repo_folder, "research"))
-                call("python setup.py install", cwd=os.path.join(self.repo_folder, "research"))
+                with FileUtil.workon(api_folder):
+                    os.system("python setup.py build")
+                    os.system("python setup.py install")
             research_folder_path = os.path.sep.join([self._repo_folder,"research"])
             slim_folder_path = os.path.sep.join([self._repo_folder,"research","slim"])
             sys.path.append(research_folder_path)

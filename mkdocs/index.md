@@ -42,14 +42,25 @@ pip install "dask[complete]"
 pip install lxml
 pip install Mako
 pip install colorlog
+pip install colorama
 pip install bs4
 pip install pick
 pip install -U scikit-learn
-pip install windows-curses
 pip install gitpython
 pip install cython
+pip install tensorflow-gpu==1.15
+```
+
+***windows***
+```console
+pip install windows-curses
 pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI
-pip install tensorflow
+```
+
+***Linux***
+```console
+sudo apt install protobuf-compiler
+pip install pycocotools
 ```
 
 ### Install library
