@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image,ImageColor
 import cv2
 from matplotlib import patches
-import matplotlib.pyplot as plt
+import matplotlib.pylab as plt
 from .color_util import ColorUtil
 
 

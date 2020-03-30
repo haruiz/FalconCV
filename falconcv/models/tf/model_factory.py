@@ -5,13 +5,7 @@ try:
     from .tf_trainable import TfTrainableModel
     from .tf_trained import TfSaveModel,TfFreezeModel,TfTrainedModel
 except ImportError as ex:
-    msg=(
-        "Tensorflow is not installed.\n\n"
-        "Please either conda or pip install as follows:\n\n"
-        "  conda install tensorflow # either conda install\n"
-        "  pip install tensorflow   # or pip install"
-    )
-    raise ImportError(msg) from ex
+   logging.error("Dependencies error: {}".format(ex))
 
 logger=logging.getLogger(__name__)
 

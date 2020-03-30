@@ -34,7 +34,7 @@ class  TFObjectDetectionAPI(ApiInstaller):
             slim_folder_path = os.path.sep.join([self._repo_folder,"research","slim"])
             sys.path.append(research_folder_path)
             sys.path.append(slim_folder_path)
-            os.environ['PYTHONPATH']+="{}:{}".format(research_folder_path, slim_folder_path)
+            os.environ['PATH']+="{}{}{}".format(research_folder_path, os.pathsep, slim_folder_path)
         except Exception as ex:
             logger.error("Error installing the package : {}".format(ex))
 
@@ -62,4 +62,8 @@ class  TFObjectDetectionAPI(ApiInstaller):
                 print(output)
             p.wait()
 
+
+if __name__ == '__main__':
+    api = TFObjectDetectionAPI()
+    api.install()
 
