@@ -1,11 +1,12 @@
 import abc
-import configparser
 import os
 from abc import ABCMeta
-from dask import delayed
+
 import dask
-from falconcv.util import LibUtil,FileUtil
-import zipfile
+from dask import delayed
+
+from falconcv.util import LibUtil, FileUtil
+
 DEP_KEY = "DEPENDENCIES"
 
 

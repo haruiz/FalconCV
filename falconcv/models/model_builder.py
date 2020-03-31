@@ -1,6 +1,6 @@
 import logging
+
 from falconcv.cons import *
-from falconcv.models.api_model import ApiModel
 
 logger=logging.getLogger(__name__)
 

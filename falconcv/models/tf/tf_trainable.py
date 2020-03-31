@@ -3,6 +3,9 @@ import os
 from pathlib import Path
 
 import pandas as pd
+
+
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from google.protobuf import text_format
@@ -10,10 +13,10 @@ from object_detection import model_hparams,model_lib,exporter
 from object_detection.protos import pipeline_pb2
 from object_detection.utils.label_map_util import get_label_map_dict
 from sklearn.model_selection import train_test_split
-
+from falconcv.models.api_model import ApiModel
 from falconcv.decor import typeassert
 from falconcv.ds import read_pascal_dataset
-from falconcv.models.model_builder import ApiModel
+
 from falconcv.models.tf.util import Utilities
 from falconcv.util import FileUtil
 logger=logging.getLogger(__name__)
@@ -95,8 +98,10 @@ class TfTrainableModel(ApiModel):
             os.makedirs(os.path.join(self._out_folder, "export/Servo"), exist_ok=True)
             # training
             tf.logging.set_verbosity(tf.logging.INFO)
-            device_name=tf.test.gpu_device_name()
-            if device_name != '/device:GPU:0':
+            #device_name=tf.test.gpu_device_name()
+            #if device_name != '/device:GPU:0':
+            gpu_available = tf.test.is_gpu_available()
+            if gpu_available:
                 session_config=tf.ConfigProto()
                 config=tf.estimator.RunConfig(
                     model_dir=self._out_folder)
