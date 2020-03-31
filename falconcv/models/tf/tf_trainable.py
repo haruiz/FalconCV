@@ -125,6 +125,7 @@ class TfTrainableModel(ApiModel):
             eval_on_train_input_fn=train_and_eval_dict['eval_on_train_input_fn']
             predict_input_fn=train_and_eval_dict['predict_input_fn']
             train_steps=train_and_eval_dict['train_steps']
+            print(train_steps)
             train_spec,eval_specs=model_lib.create_train_and_eval_specs(
                 train_input_fn,
                 eval_input_fns,
@@ -132,6 +133,7 @@ class TfTrainableModel(ApiModel):
                 predict_input_fn,
                 train_steps,
                 eval_on_train_data=False)
+            #print(eval_specs[0])
             # Currently only a single Eval Spec is allowed.
             tf.estimator.train_and_evaluate(estimator,train_spec,eval_specs[0])
         except Exception as ex:
