@@ -7,36 +7,8 @@ from PIL import Image
 from object_detection.utils.config_util import get_configs_from_pipeline_file,create_pipeline_proto_from_configs, \
     save_pipeline_config,update_input_reader_config,_update_tf_record_input_path,merge_external_params_with_configs
 
-from falconcv.decor import typeassert
-from falconcv.models.tf import ModelZoo
-from falconcv.models.tf.downloader import ModelDownloader
-from falconcv.util import LibUtil
-
 
 class Utilities:
-
-    @staticmethod
-    @typeassert(model_name=str)
-    def download_pipeline(model_name: str) -> str:
-        available_pipelines=ModelZoo.available_pipelines()
-        assert model_name in available_pipelines, \
-            "there is not a pipeline available for the model {}".format(model_name)
-        pipeline_uri=available_pipelines[model_name]
-        pipeline_model_path=os.path.join(LibUtil.tf_pipelines_home(),os.path.basename(pipeline_uri))
-        if not os.path.isfile(pipeline_model_path):
-            ModelDownloader.download_od_api_config(pipeline_uri,pipeline_model_path)
-        return pipeline_model_path
-
-    @staticmethod
-    @typeassert(model_name=str)
-    def download_model(model_name: str) -> str:
-        available_models=ModelZoo.available_models()  # get the lis
-        assert model_name in available_models,"Invalid model name {}".format(model_name)
-        checpoint_model_path=os.path.join(LibUtil.tf_models_home(),model_name)
-        if not os.path.exists(checpoint_model_path):
-            model_uri=available_models[model_name]
-            ModelDownloader.download_od_api_model(model_uri,checpoint_model_path)
-        return checpoint_model_path
 
     @staticmethod
     def create_record(image_path: str,instances: pd.DataFrame,labels_map: dict):

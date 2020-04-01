@@ -18,4 +18,4 @@ class ModelBuilder:
             else:
                 raise NotImplementedError("Invalid backend parameter")
         except Exception as ex:
-            logger.error("Error creating the model: {}".format(ex))
+            logger.error("Error creating the model: {}".format(ex.with_traceback()))

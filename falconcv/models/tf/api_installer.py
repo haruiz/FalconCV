@@ -4,6 +4,7 @@ import logging
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 from falconcv.models import ApiInstaller
 from falconcv.util import FileUtil
@@ -14,50 +15,47 @@ logger = logging.getLogger(__name__)
 class TFObjectDetectionAPI(ApiInstaller):
     def __init__(self):
         super(TFObjectDetectionAPI, self).__init__()
-        self._repo_uri = "https://github.com/tensorflow/models.git"
+        self.repo_uri = "https://github.com/tensorflow/models.git"
         self._package_name = "object_detection"
+
 
     def install(self):
         try:
+            logger.debug("Installing Api")
             super(TFObjectDetectionAPI, self).install()
             self._protobuf_comp()
-            api_folder = os.path.sep.join(
-                [self._repo_folder,
-                 "research"])
+            research_folder = self.repo_folder.joinpath("research")
+            slim_folder = research_folder.joinpath("slim")
             if importlib.util.find_spec(self._package_name) is None:
-                with FileUtil.workon(api_folder):
+                with FileUtil.workon(str(research_folder)):
                     os.system("python setup.py build")
                     os.system("python setup.py install")
-            research_folder_path = os.path.sep.join([self._repo_folder, "research"])
-            slim_folder_path = os.path.sep.join([self._repo_folder, "research", "slim"])
-            sys.path.append(research_folder_path)
-            sys.path.append(slim_folder_path)
-            os.environ['PATH'] += "{}{}{}".format(research_folder_path, os.pathsep, slim_folder_path)
+            sys.path.append(str(research_folder))
+            sys.path.append(str(slim_folder))
+            os.environ['PATH'] += "{}{}{}".format(str(research_folder), os.pathsep, str(slim_folder))
+            logger.debug("Api installation done")
         except Exception as ex:
             logger.error("Error installing the package : {}".format(ex))
 
     def _protobuf_comp(self):
-        cwd = os.path.join(self._repo_folder, "research")
-        protos_folder = os.path.sep.join(
-            [self._repo_folder,
-             "research",
-             "object_detection",
-             "protos"])
-        protos_folder = os.path.realpath(protos_folder)
-        protos_files = glob.glob("{}/*.proto".format(protos_folder))
-        for file_path in protos_files:
-            _, filename = os.path.split(file_path)
+        research_folder = self.repo_folder.joinpath("research")
+        protos_folder = research_folder.joinpath("object_detection", "protos")
+        protos_files = glob.glob("{}/*.proto".format(str(protos_folder)))
+        for abs_file_path in protos_files:
+            file_name = Path(abs_file_path).name
+            rel_file_path = "object_detection/protos/{}".format(file_name)
             p = subprocess.Popen(
-                ['protoc', "object_detection/protos/{}".format(filename), "--python_out=."],
+                ['protoc', rel_file_path, "--python_out=."],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                universal_newlines=True, cwd=cwd)
+                universal_newlines=True,
+                cwd=str(research_folder))
             output = p.stdout.readlines()
             error = p.stderr.readlines()
             if error:
-                print(error)
+                raise IOError(error)
             if output:
-                print(output)
+                logger.debug(output)
             p.wait()
 
 

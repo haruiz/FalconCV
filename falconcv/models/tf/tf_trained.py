@@ -7,8 +7,9 @@ from object_detection.utils import ops as utils_ops
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
 from falconcv.decor import typeassert
 from falconcv.models.api_model import ApiModel
-from falconcv.models.tf.misc import BoundingBox
-from falconcv.models.tf.util import Utilities
+from .misc import BoundingBox
+from .util import Utilities
+from .downloader import  Downloader
 from falconcv.util import ImageUtil
 import logging
 logger=logging.getLogger(__name__)
@@ -140,7 +141,7 @@ class TfSaveModel(TfTrainedModel):
     def __enter__(self):
         super(TfSaveModel, self).__enter__()
         if not os.path.isdir(self._model):
-            download_folder =Utilities.download_model(self._model)
+            download_folder =Downloader.download_model(self._model)
             self._model = os.path.join(download_folder, "saved_model")
         self._tf_model=Utilities.load_save_model(self._model)
         return self
