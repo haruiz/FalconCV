@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from botocore import UNSIGNED, exceptions
 from botocore.config import Config
-
+import cv2
 
 class S3Util:
     @staticmethod
@@ -14,7 +14,9 @@ class S3Util:
             bytes_io=BytesIO()
             s3.download_fileobj(bucket,key,bytes_io)
             im=Image.open(bytes_io)
-            return np.array(im)
+            img = np.array(im)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            return img
         except exceptions.ClientError as e:
             if e.response['Error']['Code'] == "404":
                 #print("The object does not exist.")

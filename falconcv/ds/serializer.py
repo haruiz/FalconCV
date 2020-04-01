@@ -84,7 +84,6 @@ class PascalVOC(Encoder):
             image_file_name="{}.jpg".format(tagged_image.id)
             image_path =os.path.join(out_folder,image_file_name)
             img = tagged_image.img
-            #img=cv2.cvtColor(tagged_image.img,cv2.COLOR_BGR2RGB)
             cv2.imwrite(image_path,img)
             if len(tagged_image.regions) > 0:
                 polygons = [r for r in tagged_image.regions if isinstance(r, PolygonRegion)]

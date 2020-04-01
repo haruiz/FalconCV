@@ -7,6 +7,7 @@ import dask
 import dask.dataframe as dd
 import more_itertools
 import numpy as np
+import cv2
 from dask.diagnostics import ProgressBar
 
 from falconcv.ds.dataset import DatasetDownloader
