@@ -1,3 +1,4 @@
+import functools
 import logging
 import os
 from pathlib import Path
@@ -5,6 +6,8 @@ import pandas as pd
 import tensorflow as tf
 from google.protobuf import text_format
 from object_detection import model_hparams, model_lib, exporter
+from object_detection.builders import graph_rewriter_builder, dataset_builder, model_builder
+from object_detection.legacy import trainer
 from object_detection.protos import pipeline_pb2
 from object_detection.utils.label_map_util import get_label_map_dict
 from sklearn.model_selection import train_test_split
@@ -14,6 +17,7 @@ from falconcv.ds import read_pascal_dataset
 from falconcv.util import FileUtil
 from .zoo import ModelZoo
 from .util import Utilities
+
 
 logger = logging.getLogger(__name__)
 
@@ -170,3 +174,64 @@ class TfTrainableModel(ApiModel):
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type:
             logger.error("Error loading the model:  {}, {}".format(exc_type, str(exc_val)))
+
+
+    @tf.contrib.framework.deprecated(None, 'Use object_detection/model_main.py.')
+    def _train(self, epochs=100, val_split=0.3, clear_folder=False, override_pipeline=False):
+        try:
+            tf.logging.set_verbosity(tf.logging.INFO)
+            tf.disable_eager_execution()
+            if clear_folder:
+                FileUtil.clear_folder(self._out_folder)
+            assert not self._dataset_df.empty, "the dataset is empty, or the model wasn't initialized correctly"
+            self._mk_labels_map()
+            self._mk_records(val_split)
+            if not os.path.isfile(self._new_model_pipeline_file) or override_pipeline:
+                pipeline = Utilities.load_pipeline(self._checkpoint_model_pipeline_file)
+                num_classes = len(self.labels())
+                pipeline = Utilities.update_pipeline(
+                    pipeline,
+                    num_classes,
+                    str(Path(self._checkpoint_model_folder)),
+                    str(Path(self._labels_map_file)),
+                    str(Path(self._val_record_file)),
+                    str(Path(self._train_record_file)),
+                    epochs
+                )
+                Utilities.save_pipeline(pipeline, self._out_folder)
+            ps_tasks = 0
+            worker_replicas = 1
+            worker_job_name = 'lonely_worker'
+            task = 0
+            is_chief = True
+            master = ''
+            graph_rewriter_fn = None
+            # loading and reading  the config file
+            configs = Utilities.load_pipeline(self._new_model_pipeline_file)
+            model_config = configs['model']
+            train_config = configs['train_config']
+            input_config = configs['train_input_config']
+            # creating the tf object detection api model (from the config parameters)
+            model_fn = functools.partial(model_builder.build, model_config=model_config, is_training=True)
+            def get_next(config):
+                return dataset_builder.make_initializable_iterator(dataset_builder.build(config)).get_next()
+            create_input_dict_fn = functools.partial(get_next, input_config)
+            if 'graph_rewriter_config' in configs:
+                graph_rewriter_fn = graph_rewriter_builder.build(configs['graph_rewriter_config'], is_training=True)
+            # training the model with the new parameters
+            trainer.train(
+                create_input_dict_fn,
+                model_fn,
+                train_config,
+                master,
+                task,
+                1,
+                worker_replicas,
+                False,
+                ps_tasks,
+                worker_job_name,
+                is_chief,
+                self._out_folder,
+                graph_hook_fn=graph_rewriter_fn)
+        except Exception as ex:
+            logger.error("Error training the model : {}".format(ex))
