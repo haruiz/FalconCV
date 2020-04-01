@@ -96,3 +96,11 @@ class FileUtil:
         else:
             raise IOError("Extension not supported yet") # for other kind of file extensions like .zip
 
+    @staticmethod
+    def unzip_file(zip_file_path: str):
+        zip_output_folder, _ = os.path.splitext(zip_file_path)
+        if not os.path.exists(zip_output_folder):
+            assert zipfile.is_zipfile(zip_file_path), "Invalid file format"
+            with zipfile.ZipFile(zip_file_path, "r") as zf:
+                zf.extractall(zip_output_folder)
+        return zip_output_folder
