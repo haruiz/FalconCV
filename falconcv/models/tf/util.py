@@ -113,8 +113,7 @@ class Utilities:
         save_pipeline_config(pipeline_proto,out_folder)
 
     @staticmethod
-    def update_pipeline(pipeline_dict,num_classes,checkpoint_model_folder,labels_map_file,val_record_f,train_record_f,
-                        epochs):
+    def update_pipeline(pipeline_dict,num_classes,checkpoint_model_folder,labels_map_file,val_record_f,train_record_f,  epochs):
         update_input_reader_config(pipeline_dict,
                                    key_name="train_input_config",
                                    input_name=None,

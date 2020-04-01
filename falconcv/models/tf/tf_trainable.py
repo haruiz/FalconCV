@@ -50,8 +50,11 @@ class TfTrainableModel(ApiModel):
     def labels(self):
         return self._dataset_df["class"].unique()
 
-    def _load_dataset(self):
+    def _load_dataset_for_detection(self):
         self._dataset_df=read_pascal_dataset(self._xml_folder)
+
+    def _load_dataset_for_segmentation(self):
+        self._dataset_df = read_pascal_dataset(self._xml_folder)
 
     def _mk_labels_map(self):
         if os.path.isfile(self._labels_map_file):
@@ -98,8 +101,6 @@ class TfTrainableModel(ApiModel):
             os.makedirs(os.path.join(self._out_folder, "export/Servo"), exist_ok=True)
             # training
             tf.logging.set_verbosity(tf.logging.INFO)
-            #device_name=tf.test.gpu_device_name()
-            #if device_name != '/device:GPU:0':
             gpu_available = tf.test.is_gpu_available()
             if gpu_available:
                 session_config=tf.ConfigProto()
@@ -173,7 +174,14 @@ class TfTrainableModel(ApiModel):
         try:
             self._checkpoint_model_folder=Utilities.download_model(self._model_name)
             self._checkpoint_model_pipeline_file=Utilities.download_pipeline(self._model_name)
-            self._load_dataset()
+            pipeline_dict = Utilities.load_pipeline(self._checkpoint_model_pipeline_file)
+            model_config = pipeline_dict["model"]  # read Detection model
+            model_arch = model_config.WhichOneof("model")
+            print(model_arch)
+            if model_arch in ["ssd", "faster_rcnn"]:
+                self._load_dataset_for_detection()
+            else:
+                raise Exception("Arch not supported yet")
             return self
         except  Exception as ex:
             logger.error("Error loading the model {}".format(ex))
