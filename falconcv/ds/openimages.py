@@ -53,7 +53,7 @@ class OpenImages(DatasetDownloader):
 
     def setup(self, split="train", task="detection"):
         try:
-            assert task == "detection","task not implemented yet"
+            assert task == "detection","task {} not implemented yet.".format(task)
             assert split in ["train","test","validation"],"invalid split parameter"
             super(OpenImages,self).setup(split, task)
             class_descriptions_csv=self._get_dependency("class_names_object_detection")
@@ -69,6 +69,7 @@ class OpenImages(DatasetDownloader):
                     self.slabels_map ={row[0]: self.labels_map[row[0]] for _,row in dds.iterrows() if row[0] in self.labels_map}
         except Exception as ex:
             logger.error("Error preparing the dataset : {} ".format(ex))
+            raise ex
 
     def _get_annotation_file(self):
         dep_map = {
@@ -178,4 +179,5 @@ class OpenImages(DatasetDownloader):
                         del results
         except Exception as ex:
             logger.exception("Error fetching the images : {} ".format(ex)) # in case something wrong happens
+            raise  ex
 

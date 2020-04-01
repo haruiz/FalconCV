@@ -31,7 +31,7 @@ class FileUtil:
                     if chunk:
                         f.write(chunk)
                         f.flush()
-            logger.info("file downloaded successfully")
+            logger.info("file downloaded successfully from {}".format(file_uri))
         return  out_file
 
     @staticmethod

@@ -66,14 +66,13 @@ class DatasetDownloader(metaclass=ABCMeta):
         for dep_name, dep_uri in self._remote_dep.items():
             dep_filename = Path(urlparse(dep_uri).path).name
             dep_path = self._home().joinpath(dep_filename)
-            print(dep_path)
             task = delayed(FileUtil.download_file)(dep_uri,dep_path)
             delayed_tasks[dep_name] = task
         self._dependencies =dask.compute(delayed_tasks)[0]
 
     def _get_dependency(self,name):
         """@:return: "a dependency path """
-        return self._dependencies.get(name,None)
+        return str(self._dependencies.get(name,None))
 
     @abc.abstractmethod
     def fetch(self,n=None, labels=None, batch_size : int= 200):

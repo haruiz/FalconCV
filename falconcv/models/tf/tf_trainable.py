@@ -130,7 +130,7 @@ class TfTrainableModel(ApiModel):
             # Currently only a single Eval Spec is allowed.
             tf.estimator.train_and_evaluate(estimator, train_spec, eval_specs[0])
         except Exception as ex:
-            logger.error("Error training the model {}".format(ex))
+            raise Exception("Error training the model {}".format(ex)) from ex
         return super(TfTrainableModel, self).train()
 
     @typeassert(checkpoint=int, out_folder=str)
@@ -156,7 +156,7 @@ class TfTrainableModel(ApiModel):
                 input_shape=None,
                 write_inference_graph=False)
         except Exception as ex:
-            logger.error("Error freezing the model {}".format(ex))
+            raise Exception("Error freezing the model {}".format(ex)) from ex
         return super(TfTrainableModel, self).freeze()
 
     def eval(self, *args, **kwargs):
@@ -169,7 +169,8 @@ class TfTrainableModel(ApiModel):
             self._load_dataset()
             return self
         except  Exception as ex:
-            logger.error("Error loading the model {}".format(ex))
+            raise Exception("Error loading the model {}".format(ex)) from ex
+
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type:
@@ -234,4 +235,4 @@ class TfTrainableModel(ApiModel):
                 self._out_folder,
                 graph_hook_fn=graph_rewriter_fn)
         except Exception as ex:
-            logger.error("Error training the model : {}".format(ex))
+            raise Exception("Error training the model : {}".format(ex)) from ex

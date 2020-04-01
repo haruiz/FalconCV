@@ -129,6 +129,7 @@ class Coco(DatasetDownloader):
                         del results
         except Exception as ex:
             logger.exception("Error fetching the images : {} ".format(ex))  # in case something wrong happens
+            raise ex
 
     def setup(self, split="train", task="detection"):
         try:
@@ -147,8 +148,6 @@ class Coco(DatasetDownloader):
             self.slabels_map = self.labels_map
         except Exception as ex:
             logger.error("Error preparing the dataset : {} ".format(ex))
-
-if __name__ == '__main__':
-    pass
+            raise ex
 
 
