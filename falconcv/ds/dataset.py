@@ -1,10 +1,10 @@
 import abc
 import os
 from abc import ABCMeta
-
+from pathlib import Path
 import dask
 from dask import delayed
-
+from urllib.parse import urlparse
 from falconcv.util import LibUtil, FileUtil
 
 DEP_KEY = "DEPENDENCIES"
@@ -52,21 +52,21 @@ class DatasetDownloader(metaclass=ABCMeta):
     def slabels_map(self,value):
         self._slabels_map=value
 
-    def _home(self):
+    def _home(self) -> Path:
         """ @:return the current dataset path """
-        lib_home=LibUtil.home()
+        ds_home=LibUtil.datasets_home()
         ds_name=type(self).__name__
-        ds_path=os.path.join(lib_home, "datasets", ds_name)
-        if not os.path.exists(ds_path):
-            os.makedirs(ds_path,exist_ok=True)
+        ds_path=ds_home.joinpath(ds_name)
+        ds_path.mkdir(exist_ok=True)
         return ds_path
 
     def _download_dependencies(self):
         """Download the dataset dependencies"""
         delayed_tasks= {}
         for dep_name, dep_uri in self._remote_dep.items():
-            _, dep_filename = os.path.split(dep_uri)
-            dep_path = os.path.join(self._home(), dep_filename)
+            dep_filename = Path(urlparse(dep_uri).path).name
+            dep_path = self._home().joinpath(dep_filename)
+            print(dep_path)
             task = delayed(FileUtil.download_file)(dep_uri,dep_path)
             delayed_tasks[dep_name] = task
         self._dependencies =dask.compute(delayed_tasks)[0]
