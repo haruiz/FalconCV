@@ -21,7 +21,7 @@ class FileUtil:
         out_file = Path(out_file) \
             if isinstance(out_file, str) else out_file
         if not out_file.exists():
-            logger.debug("downloading file {}".format(file_uri))
+            logger.info("downloading file {}".format(file_uri))
             r = requests.get(file_uri, stream=True)
             with open(str(out_file), 'wb') as f:
                 total_length = int(r.headers.get('content-length'))
@@ -31,7 +31,7 @@ class FileUtil:
                     if chunk:
                         f.write(chunk)
                         f.flush()
-            logger.info("file downloaded successfully from {}".format(file_uri))
+            logger.info("file downloaded successfully")
         return  out_file
 
     @staticmethod
