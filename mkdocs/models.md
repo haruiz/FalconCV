@@ -31,6 +31,25 @@ FalconCV offers a interface to work with the models from the Tensorflow object d
     
 ## Train Custom model
 
+!!! note "Train Custom model"
+    ````python
+    from falconcv.models import ModelBuilder
+    from falconcv.util import VIUtil
+    import falconcv as fcv
+    if __name__ == '__main__':
+        config = {
+            "model": model_name,
+            "images_folder": images_folder,
+            "output_folder": out_folder,
+            "labels_map": labels_map,
+        }
+        with ModelBuilder.build(config=config) as model:
+            model.train(epochs=epochs,val_split=0.3, clear_folder=False)
+            # for freezing the model            
+            model.freeze(chekpoint=epochs)
+    ````
+
+
 !!! tip "List models zoo"
     ```python
     from falconcv.models.tf import ModelZoo
@@ -45,22 +64,6 @@ FalconCV offers a interface to work with the models from the Tensorflow object d
         for model_name,model_uri in model_zoo.items():
             print(model_name,model_uri)
     ```
-
-
-!!! note "Train Custom model"
-    ````python
-    from falconcv.models import ModelBuilder
-    from falconcv.util import VIUtil
-    import falconcv as fcv
-    if __name__ == '__main__':
-        config = {
-            "model": "<Model zoo name>",
-            "images_folder": "<path to the images>",
-            "out_folder": "<path where the new model will be saved>"
-        }
-        with ModelBuilder.build(config=config) as model:
-            model.train(epochs=3000, val_split = 0.3, clear_folder=True).freeze(checkpoint=3000)
-    ````
 
 
 

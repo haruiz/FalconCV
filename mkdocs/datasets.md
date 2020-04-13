@@ -9,19 +9,21 @@ Open Images is a dataset of ~9M images annotated with image-level labels, object
 !!! note "Open Images"
     ```python
     from falconcv.ds import *
-    if __name__ == '__main__':    
-        dataset=OpenImages(v=6) # 5/6 supported
+    if __name__ == '__main__':          
+        # creating dataset
+        dataset = OpenImages(v=6) #5/6 supported
         dataset.setup(split="train", task="detection")
-        out_folder = "<output folder>"    
+        #labels = dataset.labels_map.values() # get valid labels
+        images_folder = "<output folder>"         
         for batch_images in dataset.fetch(
                 n=100, # number of images by class
                 labels=["Mouse", "dog"],# target labels
-                batch_size=50# images to load in memory
+                batch_size=50# batch images size
                 ):
-            # export the batch of images to the disk
-            PascalVOC(batch_images).encode(out_folder)
-            # access to the regions
+            # Do something cool with the images
             for img in batch_images:
+                # export images to disk 
+                img.export(images_folder)
                 for region in img.regions:
                     print(region.shape_attributes["x"], region.shape_attributes["y"])
     ```
@@ -33,25 +35,27 @@ COCO is a large-scale object detection, segmentation, and captioning dataset. CO
 [^2]:  http://cocodataset.org/
 
 !!! note "COCO (Common Objects in Context)"
-    ````python
+    ```python
     from falconcv.ds import *
-    if __name__ == '__main__':    
-        dataset=Coco(v=2017) # 5/6 supported
+    if __name__ == '__main__':          
+        # creating dataset
+        dataset = Coco(v=2017) #Only 2017 supported
         dataset.setup(split="train", task="detection")
-        out_folder = "<output folder>"    
+        #labels = dataset.labels_map.values() # get valid labels
+        images_folder = "<output folder>"         
         for batch_images in dataset.fetch(
                 n=100, # number of images by class
                 labels=["Mouse", "dog"],# target labels
-                batch_size=50# images to load in memory
+                batch_size=50# batch images size
                 ):
-            # export the batch of images to the disk
-            PascalVOC(batch_images).encode(out_folder)
-            # access to the regions
+            # Do something cool with the images
             for img in batch_images:
+                # export images to disk 
+                img.export(images_folder)
                 for region in img.regions:
                     print(region.shape_attributes["x"], region.shape_attributes["y"])
     
-    ````
+    ```
 
 **Scrapper**
 - Using the falconCV scrapper you can download images from bing and flicker

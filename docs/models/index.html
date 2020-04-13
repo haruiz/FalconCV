@@ -388,6 +388,39 @@
 
 </div>
 <h2 id="train-custom-model">Train Custom model</h2>
+<div class="admonition note">
+<p class="admonition-title">Train Custom model</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">falconcv.models</span> <span class="kn">import</span> <span class="n">ModelBuilder</span>
+<span class="kn">from</span> <span class="nn">falconcv.util</span> <span class="kn">import</span> <span class="n">VIUtil</span>
+<span class="kn">import</span> <span class="nn">falconcv</span> <span class="k">as</span> <span class="nn">fcv</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span>
+        <span class="s2">&quot;images_folder&quot;</span><span class="p">:</span> <span class="n">images_folder</span><span class="p">,</span>
+        <span class="s2">&quot;output_folder&quot;</span><span class="p">:</span> <span class="n">out_folder</span><span class="p">,</span>
+        <span class="s2">&quot;labels_map&quot;</span><span class="p">:</span> <span class="n">labels_map</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">with</span> <span class="n">ModelBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span><span class="n">val_split</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">clear_folder</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># for freezing the model            </span>
+        <span class="n">model</span><span class="o">.</span><span class="n">freeze</span><span class="p">(</span><span class="n">chekpoint</span><span class="o">=</span><span class="n">epochs</span><span class="p">)</span>
+</code></pre></div>
+</td></tr></table>
+
+</div>
 <div class="admonition tip">
 <p class="admonition-title">List models zoo</p>
 <table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
@@ -411,33 +444,6 @@
     <span class="n">model_zoo</span><span class="o">=</span><span class="n">ModelZoo</span><span class="o">.</span><span class="n">available_models</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span><span class="n">model_uri</span> <span class="ow">in</span> <span class="n">model_zoo</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span><span class="n">model_uri</span><span class="p">)</span>
-</code></pre></div>
-</td></tr></table>
-
-</div>
-<div class="admonition note">
-<p class="admonition-title">Train Custom model</p>
-<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">falconcv.models</span> <span class="kn">import</span> <span class="n">ModelBuilder</span>
-<span class="kn">from</span> <span class="nn">falconcv.util</span> <span class="kn">import</span> <span class="n">VIUtil</span>
-<span class="kn">import</span> <span class="nn">falconcv</span> <span class="k">as</span> <span class="nn">fcv</span>
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;Model zoo name&gt;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;images_folder&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;path to the images&gt;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;out_folder&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;path where the new model will be saved&gt;&quot;</span>
-    <span class="p">}</span>
-    <span class="k">with</span> <span class="n">ModelBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">val_split</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">clear_folder</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">freeze</span><span class="p">(</span><span class="n">checkpoint</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
 
