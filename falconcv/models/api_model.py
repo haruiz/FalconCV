@@ -1,7 +1,8 @@
 from abc import  ABCMeta
 import numpy as np
 from falconcv.decor import typeassert
-
+import logging
+logger = logging.getLogger(__name__)
 
 class ApiModel(metaclass=ABCMeta):
 

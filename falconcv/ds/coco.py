@@ -7,7 +7,6 @@ import dask
 import more_itertools
 from pycocotools.coco import COCO
 
-from falconcv.ds import PascalVOC
 from falconcv.ds.image import TaggedImage,BoxRegion,PolygonRegion
 from falconcv.util import FileUtil,ImageUtil
 
@@ -52,32 +51,29 @@ class Coco(DatasetDownloader):
         annotations_ids=self._coco_api_client.getAnnIds(imgIds=image_info['id'],catIds=category_id)
         annotations_info=self._coco_api_client.loadAnns(ids=annotations_ids)
         for ann_info in annotations_info:
-            segmentation=ann_info['segmentation']
-            if len(segmentation) > 0:
-                for polygon in segmentation:
-                    all_x=[]
-                    all_y=[]
+            polygons =ann_info['segmentation']
+            if len(polygons) > 0:
+                for polygon in polygons:
+                    all_x, all_y=[], []
                     for i in range(0,len(polygon),2):
                         try:
                             if isinstance(polygon[i], float) and \
                                isinstance(polygon[i+1],float):
                                     all_x.append(math.ceil(polygon[i]))
                                     all_y.append(math.ceil(polygon[i+1]))
-                        except Exception as e:
-                            print(e)
-                    r=PolygonRegion()
-                    r.shape_attributes["all_points_x"]=all_x
-                    r.shape_attributes["all_points_y"]=all_y
-                    regions.append(r)
-
-                    r=BoxRegion()
-                    bb=ann_info['bbox']
-                    r.shape_attributes["x"]=math.ceil(bb[0])
-                    r.shape_attributes["y"]=math.ceil(bb[1])
-                    r.shape_attributes["width"]=math.ceil(bb[2])
-                    r.shape_attributes["height"]=math.ceil(bb[3])
-                    r.region_attributes["name"]=class_name
-                    regions.append(r)
+                        except Exception:
+                            pass
+                    if len(all_x) > 0 and len(all_y) > 0:
+                        bb = ann_info['bbox']
+                        r=PolygonRegion()
+                        r.shape_attributes["all_points_x"]=all_x
+                        r.shape_attributes["all_points_y"]=all_y
+                        r.shape_attributes["x"] = math.ceil(bb[0])
+                        r.shape_attributes["y"] = math.ceil(bb[1])
+                        r.shape_attributes["width"] = math.ceil(bb[2])
+                        r.shape_attributes["height"] = math.ceil(bb[3])
+                        r.region_attributes["name"] = class_name
+                        regions.append(r)
         return regions
 
     @dask.delayed
@@ -133,7 +129,7 @@ class Coco(DatasetDownloader):
 
     def setup(self, split="train", task="detection"):
         try:
-            assert task == "detection" or task=="segmentation","task not implemented yet"
+            assert task == "detection" or task=="segmentation","task not supported"
             assert split in ["train","validation"],"invalid split parameter"
             super(Coco, self).setup(split, task)
             ann_file_uri=self._dependencies["annotations_file_uri"]

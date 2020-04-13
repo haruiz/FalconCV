@@ -96,6 +96,13 @@ class ColorUtil(object):
             "b": colors_rgb[:,2].tolist()}
 
     @classmethod
+    def color_palette(cls, n):
+        colors_hex = ["#" + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(n)]
+        colors_rgb = [cls.hex2RGB(x) for x in colors_hex]
+        colors_rgb = [[0,0,0]] + colors_rgb
+        return np.asarray(colors_rgb).flatten().tolist()
+
+    @classmethod
     def rand_color(cls):
         return tuple(cls.hex2RGB("#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])))
 

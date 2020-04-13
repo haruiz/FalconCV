@@ -1,64 +1,106 @@
 import io
 import os
-
-import pandas as pd
+from pathlib import Path
+from object_detection.utils import dataset_util
+from object_detection.utils.dataset_util import  *
 import tensorflow as tf
 from PIL import Image
 from object_detection.utils.config_util import get_configs_from_pipeline_file,create_pipeline_proto_from_configs, \
     save_pipeline_config,update_input_reader_config,_update_tf_record_input_path,merge_external_params_with_configs
+from lxml import etree
+import hashlib
+import numpy as np
 
 
 class Utilities:
+    @staticmethod
+    def get_files(path: Path, exts: list) -> list:
+        all_files = []
+        for ext in exts:
+            all_files.extend(path.rglob("**/*%s" % ext))
+        return all_files
 
     @staticmethod
-    def create_record(image_path: str,instances: pd.DataFrame,labels_map: dict):
-        from object_detection.utils.dataset_util import (bytes_feature,
-                                                         bytes_list_feature,
-                                                         float_list_feature,
-                                                         int64_feature,
-                                                         int64_list_feature)
-        image_name=os.path.basename(image_path).encode("utf8")
-        image_ext=os.path.splitext(image_path)[1].lower().encode("utf8")
-        fid=tf.gfile.GFile(image_path,'rb')
-        image_encoded=fid.read()
-        fid.close()
-        image_buffer=io.BytesIO(image_encoded)
-        image_raw=Image.open(image_buffer)
-        image_width=image_raw.size[0]
-        image_height=image_raw.size[1]
-        xmins=[]
-        xmaxs=[]
-        ymins=[]
-        ymaxs=[]
-        classes=[]
-        classes_names=[]
-        for _,entry in instances.iterrows():
-            xmins.append(entry['xmin']/image_width)
-            xmaxs.append(entry['xmax']/image_width)
-            ymins.append(entry['ymin']/image_height)
-            ymaxs.append(entry['ymax']/image_height)
-            class_name=entry['class'].encode('utf8')
-            classes_names.append(class_name)
-            class_id=labels_map[entry['class']]
-            classes.append(class_id)
+    def image_to_example(img_path: Path, xml_path: Path, mask_path: Path, labels_map=None):
+        # load annotations
+        annotations = None
+        if xml_path.exists():
+            with tf.io.gfile.GFile(str(xml_path), 'r') as fid:
+                xml_str = fid.read()
+            xml = etree.fromstring(xml_str)
+            annotations = dataset_util.recursive_parse_xml_to_dict(xml)['annotation']
 
-        tf_example=tf.train.Example(
-            features=tf.train.Features(
-                feature={
-                    'image/height': int64_feature(image_height),
-                    'image/width': int64_feature(image_width),
-                    'image/filename': bytes_feature(image_name),
-                    'image/source_id': bytes_feature(image_name),
-                    'image/encoded': bytes_feature(image_encoded),
-                    'image/format': bytes_feature(image_ext),
-                    'image/object/bbox/xmin': float_list_feature(xmins),
-                    'image/object/bbox/xmax': float_list_feature(xmaxs),
-                    'image/object/bbox/ymin': float_list_feature(ymins),
-                    'image/object/bbox/ymax': float_list_feature(ymaxs),
-                    'image/object/class/text': bytes_list_feature(classes_names),
-                    'image/object/class/label': int64_list_feature(classes),
-                }))
-        return tf_example
+        # read image
+        with tf.io.gfile.GFile(str(img_path), 'rb') as fid:
+            encoded_jpg = fid.read()
+        encoded_jpg_io = io.BytesIO(encoded_jpg)
+        image: Image = Image.open(encoded_jpg_io)
+        width, height = image.size
+        if image.format != 'JPEG':
+            raise ValueError('Image format not JPEG')
+        image_key = hashlib.sha256(encoded_jpg).hexdigest()
+
+        # read mask
+        mask = None
+        if mask_path.exists():
+            with tf.io.gfile.GFile(str(mask_path), 'rb') as fid:
+                encoded_mask_png = fid.read()
+            encoded_png_io = io.BytesIO(encoded_mask_png)
+            mask: Image = Image.open(encoded_png_io)
+            width, height = mask.size
+            if mask.format != 'PNG':
+                raise ValueError('Image format not PNG')
+            mask = np.asarray(mask)
+
+        # create records
+        xmins, xmaxs, ymins, ymaxs = [], [], [], []
+        classes, classes_text, encoded_masks = [], [], []
+        encoded_mask_png_list = []
+        if annotations:
+            if 'object' in annotations:
+                for obj in annotations['object']:
+                    class_name = obj['name']
+                    class_id = labels_map[class_name]
+                    xmin = float(obj['bndbox']['xmin'])
+                    xmax = float(obj['bndbox']['xmax'])
+                    ymin = float(obj['bndbox']['ymin'])
+                    ymax = float(obj['bndbox']['ymax'])
+                    xmins.append(xmin / width)
+                    ymins.append(ymin / height)
+                    xmaxs.append(xmax / width)
+                    ymaxs.append(ymax / height)
+                    classes_text.append(class_name.encode('utf8'))
+                    classes.append(class_id)
+                    # if a mask exist
+                    if isinstance(mask, np.ndarray):
+                         # object mask
+                        mask_roi = np.zeros_like(mask)
+                        mask_roi[int(ymin):int(ymax), int(xmin):int(xmax)] = mask[int(ymin):int(ymax),
+                                                                             int(xmin):int(xmax)]
+                        mask_remapped = (mask_roi == class_id).astype(np.uint8)
+                        mask_remapped = Image.fromarray(mask_remapped)
+                        output = io.BytesIO()
+                        mask_remapped.save(output, format='PNG')
+                        encoded_mask_png_list.append(output.getvalue())
+
+        feature_dict = {
+            'image/height': int64_feature(height),
+            'image/width': int64_feature(width),
+            'image/filename': bytes_feature(img_path.name.encode('utf8')),
+            'image/source_id': bytes_feature(img_path.name.encode('utf8')),
+            'image/key/sha256': bytes_feature(image_key.encode('utf8')),
+            'image/encoded': bytes_feature(encoded_jpg),
+            'image/format': bytes_feature('jpeg'.encode('utf8')),
+            'image/object/bbox/xmin': float_list_feature(xmins),
+            'image/object/bbox/xmax': float_list_feature(xmaxs),
+            'image/object/bbox/ymin': float_list_feature(ymins),
+            'image/object/bbox/ymax': float_list_feature(ymaxs),
+            'image/object/class/text': bytes_list_feature(classes_text),
+            'image/object/class/label': int64_list_feature(classes)}
+        if len(encoded_mask_png_list) > 0:
+            feature_dict['image/object/mask'] = bytes_list_feature(encoded_mask_png_list)
+        tf_data = tf.train.Example(features=tf.train.Features(feature=feature_dict))
+        return tf_data
 
     @staticmethod
     def load_save_model(model_path):

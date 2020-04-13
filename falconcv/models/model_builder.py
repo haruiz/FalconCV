@@ -1,21 +1,19 @@
-import logging
-
+import inspect
 from falconcv.cons import *
+from falconcv.decor import exception
 
-logger=logging.getLogger(__name__)
+
 
 
 class ModelBuilder:
     @classmethod
+    @exception
     def build(cls,model=None, labels_map=None, config=None, backend=TENSORFLOW):
-        try:
-            # create model base on the parameters
-            if backend == TENSORFLOW:
-                from falconcv.models.tf import APIModelFactory
-                return APIModelFactory.create(model,labels_map, config)
-            elif backend == PYTORCH:
-                raise NotImplementedError("Not implemented yet")
-            else:
-                raise NotImplementedError("Invalid backend parameter")
-        except Exception as ex:
-            logger.error("Error creating the model: {}".format(ex.with_traceback()))
+        # create model base on the parameters
+        if backend == TENSORFLOW:
+            from falconcv.models.tf import APIModelFactory
+            return APIModelFactory.create(model,labels_map, config)
+        elif backend == PYTORCH:
+            raise NotImplementedError("Not implemented yet")
+        else:
+            raise NotImplementedError("Invalid backend parameter")

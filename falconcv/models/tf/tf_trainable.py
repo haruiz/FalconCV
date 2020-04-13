@@ -1,8 +1,8 @@
 import functools
+import itertools
 import logging
 import os
 from pathlib import Path
-import pandas as pd
 import tensorflow as tf
 from google.protobuf import text_format
 from object_detection import model_hparams, model_lib, exporter
@@ -12,82 +12,111 @@ from object_detection.protos import pipeline_pb2
 from object_detection.utils.label_map_util import get_label_map_dict
 from sklearn.model_selection import train_test_split
 from falconcv.models.api_model import ApiModel
-from falconcv.decor import typeassert
-from falconcv.ds import read_pascal_dataset
+from falconcv.decor import typeassert, pathassert
 from falconcv.util import FileUtil
 from .zoo import ModelZoo
+import dask
 from .util import Utilities
+import typing
 
 
 logger = logging.getLogger(__name__)
 
 class TfTrainableModel(ApiModel):
     def __init__(self, config: dict):
+        self._images = []
+        # training parameters
         self._model_name = config.get("model", None)
-        self._out_folder = config.get("out_folder", None)
+        self._out_folder = config.get("output_folder", None)
         self._images_folder = config.get("images_folder", None)
         self._masks_folder = config.get("masks_folder", self._images_folder)
         self._xml_folder = config.get("xml_folder", self._images_folder)
-        assert self._images_folder, "image folder required"
-        assert self._out_folder, "out folder required"
-        assert self._model_name, "model name required"
-        os.makedirs(self._out_folder, exist_ok=True)
-        self._dataset_df = pd.DataFrame()
+        self._labels_map = config.get("labels_map", None)
+        # pre-trained model paths
         self._checkpoint_model_folder = None
         self._checkpoint_model_pipeline_file = None
-
+        # new model paths
         self._new_model_pipeline_file = os.path.join(self._out_folder, "pipeline.config")
-        self._labels_map_file = os.path.join(self._out_folder, "label_map.pbtx")
+        self._labels_map_file = os.path.join(self._out_folder, "label_map.pbtxt")
         self._val_record_file = os.path.join(self._out_folder, "val.record")
         self._train_record_file = os.path.join(self._out_folder, "train.record")
         self._new_model_pipeline_dict = None
-        self._labels_map_dict = None
 
-    def labels(self):
-        return self._dataset_df["class"].unique()
+        if isinstance(self._labels_map, dict):
+            self._labels_map_dict = self._labels_map
+        elif isinstance(self._labels_map, str) and os.path.isfile(self._labels_map):
+            self._labels_map_dict = get_label_map_dict(self._labels_map)
+        else:
+            raise Exception("Invalid labels map config parameter provided")
+
+        assert Path(self._images_folder).exists(), "Images folder doesnt exist"
+
+
+    def model_arch(self):
+        pipeline_dict = Utilities.load_pipeline(self._checkpoint_model_pipeline_file)
+        model_config = pipeline_dict["model"]  # read Detection model
+        model_arch = model_config.WhichOneof("model")
+        return model_arch
 
     def _load_dataset(self):
-        self._dataset_df = read_pascal_dataset(self._xml_folder)
+        exts = [".jpg", ".jpeg", ".png", ".xml"]
+        files = Utilities.get_files(Path(self._images_folder),exts)
+        files = sorted(files, key=lambda img: img.name)
+        for img_name, img_files in itertools.groupby(files, key=lambda img: img.stem):
+            img_file, xml_file, mask_file = None, None, None
+            for file in img_files:
+                if file.suffix in [".jpg", ".jpeg"]:
+                    img_file = file
+                elif file.suffix == ".xml":
+                    xml_file = file
+                elif file.suffix == ".png":
+                    mask_file = file
+            if img_file and xml_file:
+                self._images.append({
+                    "image": img_file,
+                    "xml": xml_file,
+                    "mask": mask_file
+                })
+        assert len(self._images), "Not images found at the folder {}".format(self._images_folder)
 
     def _mk_labels_map(self):
         if os.path.isfile(self._labels_map_file):
             os.remove(self._labels_map_file)
         with open(self._labels_map_file, 'a') as f:
-            for idx, name in enumerate(self.labels()):
-                item = "item{{\n id: {} \n name: '{}'\n}} \n".format(idx + 1, name)
+            for name, idx in self._labels_map_dict.items():
+                item = "item{{\n id: {} \n name: '{}'\n}} \n".format(idx, name)
                 f.write(item)
 
     @classmethod
-    def _mk_record_file(cls, df: pd.DataFrame, out_file, map_labels_file):
-        map_labels = get_label_map_dict(map_labels_file)
+    def _mk_record_file(cls, images: dict, out_file, labels_map):
+        delayed_tasks = [dask.delayed(Utilities.image_to_example)(img["image"], img["xml"], img["mask"], labels_map) for img in images]
+        examples = dask.compute(*delayed_tasks)
         with tf.python_io.TFRecordWriter(out_file) as writer:
-            for key, rows in df.groupby(['image_path']):
-                tf_example = Utilities.create_record(key, rows, map_labels)
+            for tf_example in examples:
                 writer.write(tf_example.SerializeToString())
 
     def _mk_records(self, split_size):
-        train_df, val_df = train_test_split(self._dataset_df, test_size=split_size, random_state=42, shuffle=True)
-        self._mk_record_file(train_df, self._train_record_file, self._labels_map_file)
-        self._mk_record_file(val_df, self._val_record_file, self._labels_map_file)
+        train_images, val_images = train_test_split(self._images, test_size=split_size, random_state=42, shuffle=True)
+        self._mk_record_file(train_images, self._train_record_file, self._labels_map_dict)
+        self._mk_record_file(val_images, self._val_record_file, self._labels_map_dict)
 
     @typeassert(epochs=int, val_split=float, override_pipeline=bool, clear_folder=bool)
-    def train(self, epochs=100, val_split=0.3, clear_folder=False, override_pipeline=False):
+    def train_and_eval(self, epochs=100, val_split=0.3, clear_folder=False, override_pipeline=False):
         try:
             if clear_folder:
                 FileUtil.clear_folder(self._out_folder)
-            assert not self._dataset_df.empty, "the dataset is empty, or the model wasn't initialized correctly"
             self._mk_labels_map()
             self._mk_records(val_split)
             if not os.path.isfile(self._new_model_pipeline_file) or override_pipeline:
                 pipeline = Utilities.load_pipeline(self._checkpoint_model_pipeline_file)
-                num_classes = len(self.labels())
+                num_classes = len(self._labels_map_dict)
                 pipeline = Utilities.update_pipeline(
                     pipeline,
                     num_classes,
-                    str(Path(self._checkpoint_model_folder)),
-                    str(Path(self._labels_map_file)),
-                    str(Path(self._val_record_file)),
-                    str(Path(self._train_record_file)),
+                    self._checkpoint_model_folder,
+                    self._labels_map_file,
+                    self._val_record_file,
+                    self._train_record_file,
                     epochs
                 )
                 Utilities.save_pipeline(pipeline, self._out_folder)
@@ -134,7 +163,7 @@ class TfTrainableModel(ApiModel):
         return super(TfTrainableModel, self).train()
 
     @typeassert(checkpoint=int, out_folder=str)
-    def freeze(self, checkpoint, out_folder=None):
+    def freeze(self, checkpoint, out_folder: typing.Union[str,Path]=None):
         try:
             tf.disable_eager_execution()
             model_checkpoint = "{}/model.ckpt-{}".format(self._out_folder, checkpoint)
@@ -164,6 +193,7 @@ class TfTrainableModel(ApiModel):
 
     def __enter__(self):
         try:
+            os.makedirs(self._out_folder, exist_ok=True)
             self._checkpoint_model_folder = ModelZoo.download_model(self._model_name)
             self._checkpoint_model_pipeline_file = ModelZoo.download_pipeline(self._model_name)
             self._load_dataset()
@@ -171,25 +201,22 @@ class TfTrainableModel(ApiModel):
         except  Exception as ex:
             raise Exception("Error loading the model {}".format(ex)) from ex
 
-
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type:
             logger.error("Error loading the model:  {}, {}".format(exc_type, str(exc_val)))
 
-
     @tf.contrib.framework.deprecated(None, 'Use object_detection/model_main.py.')
-    def _train(self, epochs=100, val_split=0.3, clear_folder=False, override_pipeline=False):
+    def train(self, epochs=100, val_split=0.3, clear_folder=False, override_pipeline=False):
         try:
             tf.logging.set_verbosity(tf.logging.INFO)
             tf.disable_eager_execution()
             if clear_folder:
                 FileUtil.clear_folder(self._out_folder)
-            assert not self._dataset_df.empty, "the dataset is empty, or the model wasn't initialized correctly"
             self._mk_labels_map()
             self._mk_records(val_split)
             if not os.path.isfile(self._new_model_pipeline_file) or override_pipeline:
                 pipeline = Utilities.load_pipeline(self._checkpoint_model_pipeline_file)
-                num_classes = len(self.labels())
+                num_classes = len(self._labels_map_dict)
                 pipeline = Utilities.update_pipeline(
                     pipeline,
                     num_classes,

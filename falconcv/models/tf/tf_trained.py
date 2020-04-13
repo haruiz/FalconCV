@@ -1,11 +1,14 @@
 import abc
 import os
+from pathlib import Path
+
 import cv2
 import numpy as np
 import tensorflow as tf
+import typing
 from object_detection.utils import ops as utils_ops
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
-from falconcv.decor import typeassert
+from falconcv.decor import typeassert, pathassert
 from falconcv.models.api_model import ApiModel
 from .misc import BoundingBox
 from .util import Utilities
@@ -85,7 +88,8 @@ class TfTrainedModel(ApiModel):
 
 class TfFreezeModel(TfTrainedModel):
     @typeassert(freeze_model=str,labels_map=str)
-    def __init__(self,freeze_model,labels_map):
+    @pathassert
+    def __init__(self,freeze_model: typing.Union[str, Path],labels_map: typing.Union[str, Path]):
         super(TfFreezeModel, self).__init__(labels_map)
         self._freeze_model=freeze_model
         _, ext=os.path.splitext(self._freeze_model)
@@ -132,10 +136,11 @@ class TfFreezeModel(TfTrainedModel):
 
 
 class TfSaveModel(TfTrainedModel):
-    @typeassert(_model=str,labels_map=str)
-    def __init__(self,_model,labels_map):
+    @typeassert(model=str,labels_map=str)
+    @pathassert
+    def __init__(self,model: typing.Union[str, Path],labels_map: typing.Union[str, Path]):
         super(TfSaveModel, self).__init__(labels_map)
-        self._model = _model
+        self._model = model
         self._tf_model = None
 
     def __enter__(self):

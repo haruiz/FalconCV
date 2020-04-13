@@ -54,7 +54,7 @@ class OpenImages(DatasetDownloader):
 
     def setup(self, split="train", task="detection"):
         try:
-            assert task == "detection","task {} not implemented yet.".format(task)
+            assert task == "detection","Invalid task parameter"
             assert split in ["train","test","validation"],"invalid split parameter"
             super(OpenImages,self).setup(split, task)
             class_descriptions_csv=self._get_dependency("class_names_object_detection")
@@ -131,22 +131,6 @@ class OpenImages(DatasetDownloader):
                     box.region_attributes["is_group_of"]=  row["IsDepiction"]
                     box.region_attributes["is_depiction"]= row["IsInside"]
                     tagged_image.regions.append(box)
-            elif task == "segmentation":
-                for index,row in image_parts.iterrows():
-                    clicks : str = row["Clicks"]
-                    if clicks:
-                        points = list(map(lambda x: x.split(),clicks.split(";")))
-                        all_x = list(map(lambda pt: int(float(pt[0])* w), points))
-                        all_y = list(map(lambda pt: int(float(pt[1])* h),points))
-                        r=PolygonRegion()
-                        r.shape_attributes["x"] = int(row["BoxXMin"]*w)
-                        r.shape_attributes["y"] = int(row["BoxYMin"]*h)
-                        r.shape_attributes["width"]=int(row["BoxXMax"]*w)-r.shape_attributes["x"]
-                        r.shape_attributes["height"] = int(row["BoxYMax"]*h)-r.shape_attributes["y"]
-                        r.shape_attributes["all_points_x"]=all_x
-                        r.shape_attributes["all_points_y"]=all_y
-                        r.region_attributes["name"]=self._labels_map[row["LabelName"]]
-                        tagged_image.regions.append(r)
         except Exception as ex:
             logger.error("error annotating the image with id {} : {}".format(tagged_image.id,ex))
 
