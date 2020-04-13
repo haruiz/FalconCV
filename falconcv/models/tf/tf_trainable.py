@@ -51,7 +51,6 @@ class TfTrainableModel(ApiModel):
 
         assert Path(self._images_folder).exists(), "Images folder doesnt exist"
 
-
     def model_arch(self):
         pipeline_dict = Utilities.load_pipeline(self._checkpoint_model_pipeline_file)
         model_config = pipeline_dict["model"]  # read Detection model
@@ -78,6 +77,7 @@ class TfTrainableModel(ApiModel):
                     "mask": mask_file
                 })
         assert len(self._images), "Not images found at the folder {}".format(self._images_folder)
+
 
     def _mk_labels_map(self):
         if os.path.isfile(self._labels_map_file):
@@ -160,7 +160,7 @@ class TfTrainableModel(ApiModel):
             tf.estimator.train_and_evaluate(estimator, train_spec, eval_specs[0])
         except Exception as ex:
             raise Exception("Error training the model {}".format(ex)) from ex
-        return super(TfTrainableModel, self).train()
+        return self
 
     @typeassert(checkpoint=int, out_folder=str)
     def freeze(self, checkpoint, out_folder: typing.Union[str,Path]=None):
@@ -204,6 +204,7 @@ class TfTrainableModel(ApiModel):
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type:
             logger.error("Error loading the model:  {}, {}".format(exc_type, str(exc_val)))
+            raise exc_val
 
     @tf.contrib.framework.deprecated(None, 'Use object_detection/model_main.py.')
     def train(self, epochs=100, val_split=0.3, clear_folder=False, override_pipeline=False):
@@ -263,3 +264,4 @@ class TfTrainableModel(ApiModel):
                 graph_hook_fn=graph_rewriter_fn)
         except Exception as ex:
             raise Exception("Error training the model : {}".format(ex)) from ex
+        return super(TfTrainableModel, self).train()

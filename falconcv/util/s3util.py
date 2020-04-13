@@ -15,7 +15,6 @@ class S3Util:
             s3.download_fileobj(bucket,key,bytes_io)
             im=Image.open(bytes_io)
             img = np.array(im)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             return img
         except exceptions.ClientError as e:
             if e.response['Error']['Code'] == "404":

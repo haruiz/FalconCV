@@ -42,7 +42,7 @@ class Utilities:
 
         # read mask
         mask = None
-        if mask_path.exists():
+        if mask_path and mask_path.exists():
             with tf.io.gfile.GFile(str(mask_path), 'rb') as fid:
                 encoded_mask_png = fid.read()
             encoded_png_io = io.BytesIO(encoded_mask_png)

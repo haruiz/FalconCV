@@ -90,7 +90,7 @@ class TaggedImage:
         out_folder.mkdir(exist_ok=True)
         # create xml
         self.filename= "{}.jpeg".format(self.id)
-        image = Image.fromarray(self.img)
+        image = Image.fromarray(self.img).convert("RGB")
         width, height = image.size
         number_of_channels = len(image.getbands())
         # export image
