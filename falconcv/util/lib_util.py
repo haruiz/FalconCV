@@ -13,7 +13,7 @@ class LibUtil:
     @classmethod
     def models_home(cls, subfolder)-> Path:
         models_path = cls.home().joinpath("models/{}".format(subfolder))
-        models_path.mkdir(exist_ok=True)
+        models_path.mkdir(parents=True,exist_ok=True)
         return models_path
 
     @classmethod
@@ -31,7 +31,7 @@ class LibUtil:
     @classmethod
     def pipelines_home(cls, subfolder) -> Path:
         pipelines_folder = cls.home().joinpath("pipelines/{}".format(subfolder))
-        pipelines_folder.mkdir(exist_ok=True)
+        pipelines_folder.mkdir(parents=True,exist_ok=True)
         return pipelines_folder
 
     @staticmethod
