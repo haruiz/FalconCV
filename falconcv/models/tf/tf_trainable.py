@@ -165,7 +165,6 @@ class TfTrainableModel(ApiModel):
     @typeassert(checkpoint=int, out_folder=str)
     def freeze(self, checkpoint, out_folder: typing.Union[str,Path]=None):
         try:
-            tf.disable_eager_execution()
             model_checkpoint = "{}/model.ckpt-{}".format(self._out_folder, checkpoint)
             if out_folder:
                 frozen_model_path = os.path.join(out_folder, "frozen_inference_graph.pb")

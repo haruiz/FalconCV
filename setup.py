@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="falconcv",
-    version="1.0.18",
+    version="1.0.19",
     author="Henry Ruiz",
     author_email="henry.ruiz@tamu.edu",
     description="Computer Vision Transfer Learning Library",

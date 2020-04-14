@@ -16,7 +16,6 @@ from .zoo import  ModelZoo
 from falconcv.util import ImageUtil
 import logging
 logger=logging.getLogger(__name__)
-tf.enable_eager_execution()
 
 
 class TfTrainedModel(ApiModel):
@@ -56,12 +55,20 @@ class TfTrainedModel(ApiModel):
         scores=output_dict["detection_scores"]
         classes=output_dict["detection_classes"].astype(np.int64)
         num_detections=output_dict['num_detections']
-        masks=[None for i in range(num_detections)]
+        masks=[None for _ in range(num_detections)]
         predictions=[]
         if 'detection_masks' in output_dict:
+            # get masks
             masks=output_dict["detection_masks"]
+            #adjust mask coordinates based on the images dimensions
             masks=utils_ops.reframe_box_masks_to_image_masks(masks,boxes,img_height,img_width)
-            masks=tf.cast(masks > threshold,tf.uint8).numpy()
+            # check eager execution mode
+            if tf.executing_eagerly():
+                masks=tf.cast(masks > threshold,tf.uint8).numpy()
+            else:
+                masks_tensor = tf.cast(masks > threshold,tf.uint8)
+                masks = masks_tensor.eval(session=tf.Session())
+
         for box,mask,score,label in zip(boxes,masks,scores,classes):
             if score >= threshold:
                 if self._labels_map_dict and label in self._labels_map_dict:
@@ -124,12 +131,12 @@ class TfFreezeModel(TfTrainedModel):
 
     def output_dict(self, img_arr: np.ndarray):
         if self._graph and self._session:
-            img_expanded=np.expand_dims(img_arr,axis=0)
+            img_expanded = np.expand_dims(img_arr, axis=0)
             tensors_dict = self._get_tensors_dict(self._graph)
-            image_tensor=self._graph.get_tensor_by_name('image_tensor:0')
-            output_dict=self._session.run(tensors_dict,feed_dict={image_tensor: img_expanded})
-            num_detections=int(output_dict.pop('num_detections'))
-            output_dict={k: np.squeeze(v) for k,v in output_dict.items()}
+            image_tensor = self._graph.get_tensor_by_name('image_tensor:0')
+            output_dict = self._session.run(tensors_dict, feed_dict={image_tensor: img_expanded})
+            num_detections = int(output_dict.pop('num_detections'))
+            output_dict = {k: np.squeeze(v) for k, v in output_dict.items()}
             output_dict['num_detections']=num_detections
             return output_dict
         return None
@@ -159,8 +166,14 @@ class TfSaveModel(TfTrainedModel):
             img_expanded=np.expand_dims(img_arr,axis=0)
             img_tensor=tf.convert_to_tensor(img_expanded)
             output_dict=self._tf_model(img_tensor)  # just get the predictions of the model
-            num_detections=int(output_dict.pop('num_detections'))
-            output_dict={key: value[0,:num_detections].numpy() for key,value in output_dict.items()}
-            output_dict['num_detections']=num_detections
+            if tf.executing_eagerly():
+                num_detections=int(output_dict.pop('num_detections'))
+                output_dict={key: value[0,:num_detections].numpy() for key,value in output_dict.items()}
+            else:
+                with tf.Session() as sess:
+                    output_dict = sess.run(output_dict)
+                    num_detections = int(output_dict.pop('num_detections'))
+                    output_dict = {k: np.squeeze(v) for k, v in output_dict.items()}
+            output_dict['num_detections'] = num_detections
             return output_dict
         return None
