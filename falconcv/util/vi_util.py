@@ -77,7 +77,7 @@ class VIUtil:
         A = [1.0] * len(labels)
         palette=list(zip(B.tolist(),G.tolist(),R.tolist(), A))
         colors={label: palette[i] for i,label in enumerate(labels)}
-        rgb= cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+        #rgb= cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         fig=plt.figure(figsize=(20,10))
         ax=fig.add_subplot(111, aspect='equal')
         for i,box in enumerate(boxes):
@@ -85,7 +85,7 @@ class VIUtil:
             if isinstance(box.mask, np.ndarray):
                 mask = box.mask
                 rgb_color=tuple(map(lambda x: math.floor(x*255),c[:-1]))
-                cls.draw_mask(rgb, mask, color=rgb_color, alpha=alpha)
+                cls.draw_mask(img, mask, color=rgb_color, alpha=alpha)
             label="{} :{:.2f}".format(box.label,box.score)
             ax.add_patch(
                 patches.Rectangle(
@@ -105,7 +105,7 @@ class VIUtil:
                 fontsize=12,
                 bbox=dict(boxstyle="round",facecolor=colors[box.label],alpha=0.9))
             ax.set_axis_off()
-        ax.imshow(rgb)
+        ax.imshow(img)
         #img = cls.fig2numpy(fig)
         #cls._imshow(img)
         plt.show()

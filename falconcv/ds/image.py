@@ -21,7 +21,7 @@ pascal_voc_template = '''
     <segmented>0</segmented>
     % for i, region in enumerate(annotations):
         <object>
-            <name>${region.region_attributes["name"]}</name>
+            <name>${region.region_attributes["name"].title()}</name>
             <pose>Unspecified</pose>
             <truncated>0</truncated>
             <difficult>0</difficult>

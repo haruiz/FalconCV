@@ -44,6 +44,7 @@ class TfTrainableModel(ApiModel):
 
         if isinstance(self._labels_map, dict):
             self._labels_map_dict = self._labels_map
+            self._labels_map_dict = {k.title(): v for k,v in self._labels_map_dict.items()}
         elif isinstance(self._labels_map, str) and os.path.isfile(self._labels_map):
             self._labels_map_dict = get_label_map_dict(self._labels_map)
         else:
@@ -84,7 +85,7 @@ class TfTrainableModel(ApiModel):
             os.remove(self._labels_map_file)
         with open(self._labels_map_file, 'a') as f:
             for name, idx in self._labels_map_dict.items():
-                item = "item{{\n id: {} \n name: '{}'\n}} \n".format(idx, name)
+                item = "item{{\n id: {} \n name: '{}'\n}} \n".format(idx, name.title())
                 f.write(item)
 
     @classmethod
