@@ -15,14 +15,7 @@ Additionally, taking advantage of the fantastic features that OpenVINO offers, a
 
 ## Roadmap
 
-**Frameworks Support:**
-
-- [Detectron2](https://github.com/facebookresearch/detectron2)
-- [GluonCV](https://gluon-cv.mxnet.io/)
-
-## Using Docker
-
-Coming soon!
+[You can see the roadmap detail here](https://github.com/github/hub/projects/1)
 
 ## How to contribute
 
