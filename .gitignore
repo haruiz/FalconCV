@@ -110,3 +110,5 @@ venv.bak/
 studio.db-shm
 studio.db-wal
 test.py
+.vs
+extra/
