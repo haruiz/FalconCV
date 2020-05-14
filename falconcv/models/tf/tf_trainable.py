@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from falconcv.models.api_model import ApiModel
 from falconcv.decor import typeassert, pathassert
 from falconcv.util import FileUtil
-from .zoo import ModelZoo
+from .tf_model_zoo import TFModelZoo
 import dask
 from .util import Utilities
 import typing
@@ -194,8 +194,8 @@ class TfTrainableModel(ApiModel):
     def __enter__(self):
         try:
             os.makedirs(self._out_folder, exist_ok=True)
-            self._checkpoint_model_folder = ModelZoo.download_model(self._model_name)
-            self._checkpoint_model_pipeline_file = ModelZoo.download_pipeline(self._model_name)
+            self._checkpoint_model_folder = TFModelZoo.download_model(self._model_name)
+            self._checkpoint_model_pipeline_file = TFModelZoo.download_pipeline(self._model_name)
             self._load_dataset()
             return self
         except  Exception as ex:

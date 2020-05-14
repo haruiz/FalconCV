@@ -1,6 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-from falconcv.models.tf import ModelZoo
+from falconcv.models.tf import TFModelZoo
 from falconcv.ds import *
 from falconcv.util import FileUtil, VIUtil, ColorUtil
 from falconcv.models import ModelBuilder
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # creating the dataset
     create_dataset(images_folder, labels_map,color_palette, n=1000)
     # picking and training the model
-    print(ModelZoo.available_models(arch="mask")) # check the models available
+    TFModelZoo.print_available_models(arch="mask") # check the models available
     train_model("mask_rcnn_inception_v2_coco",images_folder, model_folder, labels_map)
 
     #doing inference
