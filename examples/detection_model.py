@@ -4,7 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import sys
 sys.path.append('.')
 
-from falconcv.models.tf import ModelZoo
+from falconcv.models.tf import TFModelZoo
 from falconcv.ds import *
 from falconcv.util import FileUtil, VIUtil
 from falconcv.models import ModelBuilder
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     create_dataset(images_folder, labels_map, n=500, batch_size=250)
 
     # pick model from zoo
-    print(ModelZoo.available_models(arch="faster"))  # check the models available
+    TFModelZoo.print_available_models(arch="faster")
 
     # train model
     train_model("faster_rcnn_inception_v2_coco", images_folder, model_folder, labels_map)
