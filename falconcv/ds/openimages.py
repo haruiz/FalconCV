@@ -27,29 +27,33 @@ class OpenImages(DatasetDownloader):
             self._remote_dep = {
                 "class_names_object_detection": "https://storage.googleapis.com/openimages/v5/class-descriptions-boxable.csv",
                 "class_names_segmentation": "https://storage.googleapis.com/openimages/v5/classes-segmentation.txt",
+
                 "train_images": "https://storage.googleapis.com/openimages/2018_04/train/train-images-boxable-with-rotation.csv",
                 "test_images": "https://storage.googleapis.com/openimages/2018_04/test/test-images-with-rotation.csv",
                 "validation_images": "https://storage.googleapis.com/openimages/2018_04/validation/validation-images-with-rotation.csv",
+
                 "train_annotations_bbox": "https://storage.googleapis.com/openimages/2018_04/train/train-annotations-bbox.csv",
                 "test_annotations_bbox": "https://storage.googleapis.com/openimages/v5/test-annotations-bbox.csv",
                 "validation_annotations_bbox": "https://storage.googleapis.com/openimages/v5/validation-annotations-bbox.csv",
-                "train_annotations_masks": "https://storage.googleapis.com/openimages/v5/train-annotations-object-segmentation.csv",
-                "test_annotations_masks": "https://storage.googleapis.com/openimages/v5/test-annotations-object-segmentation.csv",
-                "validation_annotations_mask": "https://storage.googleapis.com/openimages/v5/validation-annotations-object-segmentation.csv"
+                # "train_annotations_masks": "https://storage.googleapis.com/openimages/v5/train-annotations-object-segmentation.csv",
+                # "test_annotations_masks": "https://storage.googleapis.com/openimages/v5/test-annotations-object-segmentation.csv",
+                # "validation_annotations_mask": "https://storage.googleapis.com/openimages/v5/validation-annotations-object-segmentation.csv"
             }
         else:
             self._remote_dep = {
                 "class_names_object_detection": "https://storage.googleapis.com/openimages/v5/class-descriptions-boxable.csv",
                 "class_names_segmentation": "https://storage.googleapis.com/openimages/v5/classes-segmentation.txt",
+
                 "train_images": "https://storage.googleapis.com/openimages/2018_04/train/train-images-boxable-with-rotation.csv",
                 "test_images": "https://storage.googleapis.com/openimages/2018_04/test/test-images-with-rotation.csv",
                 "validation_images": "https://storage.googleapis.com/openimages/2018_04/validation/validation-images-with-rotation.csv",
+
                 "train_annotations_bbox": "https://storage.googleapis.com/openimages/v6/oidv6-train-annotations-bbox.csv",
                 "test_annotations_bbox": "https://storage.googleapis.com/openimages/v5/test-annotations-bbox.csv",
                 "validation_annotations_bbox": "https://storage.googleapis.com/openimages/v5/test-annotations-bbox.csv",
-                "train_annotations_masks": "https://storage.googleapis.com/openimages/v5/train-annotations-object-segmentation.csv",
-                "test_annotations_masks": "https://storage.googleapis.com/openimages/v5/test-annotations-object-segmentation.csv",
-                "validation_annotations_mask": "https://storage.googleapis.com/openimages/v5/validation-annotations-object-segmentation.csv"
+                # "train_annotations_masks": "https://storage.googleapis.com/openimages/v5/train-annotations-object-segmentation.csv",
+                # "test_annotations_masks": "https://storage.googleapis.com/openimages/v5/test-annotations-object-segmentation.csv",
+                # "validation_annotations_mask": "https://storage.googleapis.com/openimages/v5/validation-annotations-object-segmentation.csv"
             }
 
     def setup(self, split="train", task="detection"):

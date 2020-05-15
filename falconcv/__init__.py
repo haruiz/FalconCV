@@ -27,7 +27,7 @@ formatter=ColoredFormatter(
 
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 # constants
 name="falconcv"
