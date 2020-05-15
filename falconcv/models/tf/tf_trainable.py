@@ -79,7 +79,6 @@ class TfTrainableModel(ApiModel):
                 })
         assert len(self._images), "Not images found at the folder {}".format(self._images_folder)
 
-
     def _mk_labels_map(self):
         if os.path.isfile(self._labels_map_file):
             os.remove(self._labels_map_file)
@@ -199,7 +198,7 @@ class TfTrainableModel(ApiModel):
             self._load_dataset()
             return self
         except  Exception as ex:
-            raise Exception("Error loading the model {}".format(ex)) from ex
+            raise Exception("Error loading the model : {}".format(ex)) from ex
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type:

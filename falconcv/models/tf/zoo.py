@@ -74,8 +74,7 @@ class ModelZoo:
         pipeline_uri = available_pipelines[model_name]
         filename = Path(urlparse(pipeline_uri).path).name
         pipeline_model_path = LibUtil.pipelines_home(subfolder="tf").joinpath(filename)
-        if not pipeline_model_path.exists():
-            pipeline_model_path = FileUtil.download_file(pipeline_uri, pipeline_model_path)
+        pipeline_model_path = FileUtil.download_file(pipeline_uri, pipeline_model_path, show_progress=True)
         return str(pipeline_model_path)
 
     @classmethod
@@ -84,9 +83,9 @@ class ModelZoo:
         available_models = cls.available_models()  # get the lis
         assert model_name in available_models, "Invalid model name {}".format(model_name)
         checkpoint_model_path = LibUtil.models_home(subfolder="tf").joinpath(model_name)
+        model_uri = available_models[model_name]
         if not checkpoint_model_path.exists():
-            model_uri = available_models[model_name]
-            FileUtil.download_and_unzip_file(model_uri, checkpoint_model_path)
+            FileUtil.download_file(model_uri, checkpoint_model_path, unzip=True, show_progress=True)
         return str(checkpoint_model_path)
 
 
