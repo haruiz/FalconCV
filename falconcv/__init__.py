@@ -33,9 +33,10 @@ logger.setLevel(logging.INFO)
 
 tf.get_logger().setLevel(logging.ERROR)
 
-# constants
 name = "falconcv"
 __version__ = "1.0.20"
+
+# TFODAPI Environment Vars
 os.environ["TF_OBJECT_DETECTION_MODEL_ZOO_URI"] = \
     r"https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md"
 os.environ["TF_OBJECT_DETECTION_MODEL_CONFIG_URI"] = \
