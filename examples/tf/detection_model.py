@@ -58,8 +58,8 @@ def make_predictions(frozen_model, labels_map_file, image):
 
 
 if __name__ == '__main__':
-    images_folder = "<your images folder path>"
-    model_folder = "<your model folder path>"
+    images_folder = "/mnt/D/Dev/falconcv/datasets/openimages/animals"
+    model_folder = "/mnt/D/Dev/falconcv/models/animals"
     labels_map = {
         "Bird": 1,
         "Eagle": 2,

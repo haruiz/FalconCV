@@ -1,0 +1,2 @@
+detectron:
+  model_zoo_url: https://github.com/facebookresearch/detectron2/blob/master/MODEL_ZOO.md

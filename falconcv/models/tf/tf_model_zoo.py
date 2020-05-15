@@ -97,4 +97,6 @@ class TFModelZoo:
     @classmethod
     def print_available_models(cls, arch=None):
         print("*** TensorFlow Detection Model Zoo ***")
-        _ = {model: print(f"  {model}") for model in cls.available_models(arch).keys()}
+        models = cls.available_models(arch)
+        if models is not None:
+            _ = {model: print(f"  {model}") for model in models.keys()}
