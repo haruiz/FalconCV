@@ -193,10 +193,15 @@ class TfTrainableModel(ApiModel):
 
     @typeassert(checkpoint=int, out_folder=str, add_postprocessing_op=bool, use_regular_nms=bool,
                 max_classes_per_detection=int)
-    def to_tflite(self, checkpoint, out_folder=None, max_detections=10, add_postprocessing_op=True,
+    def to_tflite(self, checkpoint,
+                  out_folder=None,
+                  input_size=(300, 300),
+                  max_detections=10,
+                  add_postprocessing_op=True,
                   use_regular_nms=True,
                   max_classes_per_detection=1):
         try:
+            assert self.model_arch() == "ssd", "This method is only supported for ssd models"
             model_checkpoint = "{}/model.ckpt-{}".format(self._out_folder, checkpoint)
             out_folder = out_folder if out_folder else self._out_folder
             pipeline_config = pipeline_pb2.TrainEvalPipelineConfig()
@@ -214,14 +219,15 @@ class TfTrainableModel(ApiModel):
                --output_format=TFLITE
                --graph_def_file="{}"
                --output_file="{}"
-               --input_shapes=1,300,300,3
+               --input_shapes="1,{},{},3"
                --input_arrays=normalized_input_image_tensor
                --output_arrays=TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3
                --inference_type=FLOAT --allow_custom_ops
                ''' \
                 .format(
                 Path(out_folder).joinpath("tflite_graph.pb"),
-                Path(out_folder).joinpath("model.tflite")
+                Path(out_folder).joinpath("model.tflite"),
+                input_size[0], input_size[1]
             )
             cmd = " ".join([line.strip() for line in cmd.splitlines()])
             print(subprocess.check_output(cmd, shell=True).decode())
