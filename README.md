@@ -56,7 +56,6 @@ pip install bs4
 pip install pick
 pip install -U scikit-learn
 pip install gitpython
-pip install omegaconf
 ```
 
 **Linux:**
