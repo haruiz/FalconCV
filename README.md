@@ -124,13 +124,13 @@ import falconcv as fcv
 
 if __name__ == '__main__':
     config = {
-        "model": model_name,
-        "images_folder": images_folder,
-        "output_folder": out_folder,
-        "labels_map": labels_map,
+        "model": "<model name>",
+        "images_folder": "<images folder path>",
+        "output_folder": "<model output folder>",
+        "labels_map": "<labels map as a dict or a file>",
     }
     with ModelBuilder.build(config=config) as model:
-        model.train(epochs=epochs,
+        model.train(epochs=2000,
                     val_split=0.3,
                     clear_folder=False)
         # for freezing the model
