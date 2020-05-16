@@ -15,12 +15,15 @@ from falconcv.models.api_model import ApiModel
 from falconcv.decor import typeassert, pathassert
 from falconcv.util import FileUtil
 from .zoo import ModelZoo
+from object_detection import export_tflite_ssd_graph_lib
+import subprocess
+
 import dask
 from .util import Utilities
 import typing
 
-
 logger = logging.getLogger(__name__)
+
 
 class TfTrainableModel(ApiModel):
     def __init__(self, config: dict):
@@ -44,7 +47,7 @@ class TfTrainableModel(ApiModel):
 
         if isinstance(self._labels_map, dict):
             self._labels_map_dict = self._labels_map
-            self._labels_map_dict = {k.title(): v for k,v in self._labels_map_dict.items()}
+            self._labels_map_dict = {k.title(): v for k, v in self._labels_map_dict.items()}
         elif isinstance(self._labels_map, str) and os.path.isfile(self._labels_map):
             self._labels_map_dict = get_label_map_dict(self._labels_map)
         else:
@@ -60,7 +63,7 @@ class TfTrainableModel(ApiModel):
 
     def _load_dataset(self):
         exts = [".jpg", ".jpeg", ".png", ".xml"]
-        files = Utilities.get_files(Path(self._images_folder),exts)
+        files = Utilities.get_files(Path(self._images_folder), exts)
         files = sorted(files, key=lambda img: img.name)
         for img_name, img_files in itertools.groupby(files, key=lambda img: img.stem):
             img_file, xml_file, mask_file = None, None, None
@@ -89,7 +92,8 @@ class TfTrainableModel(ApiModel):
 
     @classmethod
     def _mk_record_file(cls, images: dict, out_file, labels_map):
-        delayed_tasks = [dask.delayed(Utilities.image_to_example)(img["image"], img["xml"], img["mask"], labels_map) for img in images]
+        delayed_tasks = [dask.delayed(Utilities.image_to_example)(img["image"], img["xml"], img["mask"], labels_map) for
+                         img in images]
         examples = dask.compute(*delayed_tasks)
         with tf.python_io.TFRecordWriter(out_file) as writer:
             for tf_example in examples:
@@ -163,7 +167,7 @@ class TfTrainableModel(ApiModel):
         return self
 
     @typeassert(checkpoint=int, out_folder=str)
-    def freeze(self, checkpoint, out_folder: typing.Union[str,Path]=None):
+    def freeze(self, checkpoint, out_folder: typing.Union[str, Path] = None):
         try:
             model_checkpoint = "{}/model.ckpt-{}".format(self._out_folder, checkpoint)
             if out_folder:
@@ -186,6 +190,50 @@ class TfTrainableModel(ApiModel):
         except Exception as ex:
             raise Exception("Error freezing the model {}".format(ex)) from ex
         return super(TfTrainableModel, self).freeze()
+
+    @typeassert(checkpoint=int, out_folder=str, add_postprocessing_op=bool, use_regular_nms=bool,
+                max_classes_per_detection=int)
+    def to_tflite(self, checkpoint,
+                  out_folder=None,
+                  input_size=(300, 300),
+                  max_detections=10,
+                  add_postprocessing_op=True,
+                  use_regular_nms=True,
+                  max_classes_per_detection=1):
+        try:
+            assert self.model_arch() == "ssd", "This method is only supported for ssd models"
+            model_checkpoint = "{}/model.ckpt-{}".format(self._out_folder, checkpoint)
+            out_folder = out_folder if out_folder else self._out_folder
+            pipeline_config = pipeline_pb2.TrainEvalPipelineConfig()
+            with tf.gfile.GFile(self._new_model_pipeline_file, 'r') as f:
+                text_format.Merge(f.read(), pipeline_config)
+            export_tflite_ssd_graph_lib.export_tflite_graph(
+                pipeline_config,
+                model_checkpoint,
+                out_folder,
+                add_postprocessing_op,
+                max_detections,
+                max_classes_per_detection, use_regular_nms=use_regular_nms)
+            # convert to tflite
+            cmd = '''toco
+               --output_format=TFLITE
+               --graph_def_file="{}"
+               --output_file="{}"
+               --input_shapes="1,{},{},3"
+               --input_arrays=normalized_input_image_tensor
+               --output_arrays=TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3
+               --inference_type=FLOAT --allow_custom_ops
+               ''' \
+                .format(
+                Path(out_folder).joinpath("tflite_graph.pb"),
+                Path(out_folder).joinpath("model.tflite"),
+                input_size[0], input_size[1]
+            )
+            cmd = " ".join([line.strip() for line in cmd.splitlines()])
+            print(subprocess.check_output(cmd, shell=True).decode())
+            return self
+        except Exception as ex:
+            raise Exception("Error converting the model {}".format(ex)) from ex
 
     def eval(self, *args, **kwargs):
         return super(TfTrainableModel, self).eval()
@@ -241,8 +289,10 @@ class TfTrainableModel(ApiModel):
             input_config = configs['train_input_config']
             # creating the tf object detection api model (from the config parameters)
             model_fn = functools.partial(model_builder.build, model_config=model_config, is_training=True)
+
             def get_next(config):
                 return dataset_builder.make_initializable_iterator(dataset_builder.build(config)).get_next()
+
             create_input_dict_fn = functools.partial(get_next, input_config)
             if 'graph_rewriter_config' in configs:
                 graph_rewriter_fn = graph_rewriter_builder.build(configs['graph_rewriter_config'], is_training=True)
