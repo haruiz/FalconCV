@@ -37,6 +37,9 @@ class ModelInfo(object):
     def task(self, value):
         self._task = value
 
+    def get_config_path(self) -> str:
+        return "/".join(map(str, self._config_url.rsplit("/", 2)[-2:]))
+
     def __str__(self):
         return f"  model: {self.name} - task: {self.task}"
 

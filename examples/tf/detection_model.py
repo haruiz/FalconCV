@@ -66,17 +66,17 @@ if __name__ == '__main__':
         "Falcon": 3
     }
     # create the dataset
-    create_dataset(images_folder, labels_map, n=500, batch_size=250)
+    # create_dataset(images_folder, labels_map, n=500, batch_size=250)
 
     # pick model from zoo
     TFModelZoo.print_available_models(arch="faster")
 
     # train model
-    train_model("faster_rcnn_inception_v2_coco", images_folder, model_folder, labels_map)
+    # train_model("faster_rcnn_inception_v2_coco", images_folder, model_folder, labels_map)
 
     # inference
-    frozen_model_file = os.path.join(model_folder, "export/frozen_inference_graph.pb")
-    labels_map_file = os.path.join(model_folder, "label_map.pbtxt")
-    from glob import glob
-    for image in glob("examples/images/*"):
-        make_predictions(frozen_model_file, labels_map_file, image)
+    # frozen_model_file = os.path.join(model_folder, "export/frozen_inference_graph.pb")
+    # labels_map_file = os.path.join(model_folder, "label_map.pbtxt")
+    # from glob import glob
+    # for image in glob("examples/images/*"):
+    #     make_predictions(frozen_model_file, labels_map_file, image)

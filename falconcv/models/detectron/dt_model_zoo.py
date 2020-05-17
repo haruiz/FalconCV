@@ -12,11 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class DetectronModelZoo:
-    @staticmethod
-    def get_available_models(task=None) -> []:
+    _models = None
+
+    @classmethod
+    def available_models(cls, task=None) -> []:
         try:
             models = []
-            zoo_url = ConfigUtil().get_detectron_model_zoo_url()
+            zoo_url = ConfigUtil.get_detectron_model_zoo_url()
             result = requests.get(zoo_url)
             if result.status_code == 200:
                 soup = BeautifulSoup(result.content, 'lxml')
@@ -46,6 +48,8 @@ class DetectronModelZoo:
                         if model_info.task is not None:
                             models.append(model_info)
 
+            cls._models = models
+
             if task:
                 assert task in ["detection", "instance", "keypoints", "panoptic", "lvis"], "Invalid task param"
                 models = [model for model in models if model.task == task]
@@ -55,8 +59,19 @@ class DetectronModelZoo:
             logger.error("Error listing the models : {}".format(ex))
 
     @classmethod
+    def get_model_info(cls, model: str, task: str) -> ModelInfo:
+        if cls._models is None:
+            cls.available_models()
+
+        model_info = [model_info for model_info in cls._models
+                      if model_info.name == model and model_info.task == task]
+
+        if model_info is None:
+            raise ValueError('Model not found in Detectron2 model zoo')
+
+        return next(iter(model_info), None)
+
+    @classmethod
     def print_available_models(cls, task="detection"):
         print("*** Detectron2 Model Zoo ***")
-        models = cls.get_available_models(task)
-        if models is not None:
-            _ = [print(model) for model in models]
+        print(*cls.available_models(task), sep="\n")

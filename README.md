@@ -17,27 +17,27 @@ Additionally, taking advantage of the fantastic features that OpenVINO offers, a
 
 ## Option 1. Install FalconCV from GitHub source:
 
-1 - Create and activate a conda environment:
+### 1 - Create and activate a conda environment:
 
 ```bash
 conda create --name falconcv python=3.6
 ```
 
-2 - Clone FalconCV repository using `git`:
+### 2 - Clone FalconCV repository using `git`:
 
 ```bash
 git clone https://github.com/haruiz/FalconCV
 cd FalconCV folder
 ```
 
-3 - Install dependencies:
+### 3 - Install dependencies:
 
 ```bash
 pip install matplotlib
 pip install numpy==1.17
 pip install opencv-contrib-python
 pip install pillow
-pip install cython
+pip install cython pyyaml==5.1
 pip install tqdm
 pip install scipy
 pip install requests
@@ -73,9 +73,31 @@ pip install windows-curses
 pip install pycocotools-win
 ```
 
-4 - Install backends:
+### 4 - Install Backends:
 
-- **TensorFlow:** `conda install tensorflow-gpu==1.15.0`
+**TensorFlow:**
+
+```bash
+conda install tensorflow-gpu==1.15.0
+```
+
+**Note:** For more details installing TensorFlow go to the [official site](https://www.tensorflow.org/install).
+
+**PyTorch (CUDA 10):**
+
+```bash
+conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
+```
+
+**Note:** For more details installing PyTorch go to the [official site](https://pytorch.org/).
+
+**Detectron2 (CUDA 10):**
+
+```bash
+pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu100/index.html
+```
+
+**Note:** For more details installing Detectron2 go to the [official site](https://github.com/facebookresearch/detectron2/blob/master/INSTALL.md).
 
 ## Option 2. Install FalconCV from PyPi (test):
 
