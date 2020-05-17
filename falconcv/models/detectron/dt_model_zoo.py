@@ -59,13 +59,11 @@ class DetectronModelZoo:
             logger.error("Error listing the models : {}".format(ex))
 
     @classmethod
-    def get_model_info(cls, model: str, task: str) -> ModelInfo:
+    def get_model_info(cls, model: str) -> ModelInfo:
         if cls._models is None:
             cls.available_models()
 
-        model_info = [model_info for model_info in cls._models
-                      if model_info.name == model and model_info.task == task]
-
+        model_info = [model_info for model_info in cls._models if model_info.name == model]
         if model_info is None:
             raise ValueError('Model not found in Detectron2 model zoo')
 

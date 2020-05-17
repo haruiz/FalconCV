@@ -1,17 +1,27 @@
 from detectron2 import model_zoo
 from detectron2.config import get_cfg, CfgNode
+from detectron2.engine import DefaultPredictor
 
 from falconcv.models.detectron import DetectronModelZoo
 
 
 class Utilities:
     @staticmethod
-    def get_detectron_config(model: str, task: str) -> CfgNode:
-        model_info = DetectronModelZoo.get_model_info(model, task)
+    def load_predictor(model: str, threshold: float, top_k: int) -> (CfgNode, DefaultPredictor):
+        # get model info
+        model_info = DetectronModelZoo.get_model_info(model)
+
+        # create configuration file
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(model_info.get_config_path()))
         cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_info.get_config_path())
+        cfg.MODEL.RETINANET.SCORE_THRESH_TEST = threshold
+        cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
+        cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = threshold
+        cfg.TEST.DETECTIONS_PER_IMAGE = top_k
+        cfg.freeze()
 
-        print(model_zoo.__all__)
+        # create predictor
+        predictor = DefaultPredictor(cfg)
 
-        return cfg
+        return cfg, predictor
