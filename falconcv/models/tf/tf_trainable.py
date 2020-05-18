@@ -50,7 +50,7 @@ class TfTrainableModel(ApiModel):
         elif isinstance(self._labels_map, str) and os.path.isfile(self._labels_map):
             self._labels_map_dict = get_label_map_dict(self._labels_map)
         else:
-            raise Exception("Invalid labels map config parameter provided")
+            raise Exception("Invalid labels map parameter, must be a file or a dictionary")
         self._labels_map_dict = {k.title(): v for k, v in self._labels_map_dict.items()}
         assert Path(self._images_folder).exists(), "Images folder doesnt exist"
 
