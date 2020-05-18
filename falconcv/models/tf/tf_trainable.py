@@ -47,12 +47,11 @@ class TfTrainableModel(ApiModel):
 
         if isinstance(self._labels_map, dict):
             self._labels_map_dict = self._labels_map
-            self._labels_map_dict = {k.title(): v for k, v in self._labels_map_dict.items()}
         elif isinstance(self._labels_map, str) and os.path.isfile(self._labels_map):
             self._labels_map_dict = get_label_map_dict(self._labels_map)
         else:
             raise Exception("Invalid labels map config parameter provided")
-
+        self._labels_map_dict = {k.title(): v for k, v in self._labels_map_dict.items()}
         assert Path(self._images_folder).exists(), "Images folder doesnt exist"
 
     def model_arch(self):
@@ -97,7 +96,8 @@ class TfTrainableModel(ApiModel):
         examples = dask.compute(*delayed_tasks)
         with tf.python_io.TFRecordWriter(out_file) as writer:
             for tf_example in examples:
-                writer.write(tf_example.SerializeToString())
+                if tf_example:
+                    writer.write(tf_example.SerializeToString())
 
     def _mk_records(self, split_size):
         train_images, val_images = train_test_split(self._images, test_size=split_size, random_state=42, shuffle=True)

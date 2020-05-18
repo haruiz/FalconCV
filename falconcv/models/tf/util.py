@@ -31,14 +31,18 @@ class Utilities:
             annotations = dataset_util.recursive_parse_xml_to_dict(xml)['annotation']
 
         # read image
-        with tf.io.gfile.GFile(str(img_path), 'rb') as fid:
-            encoded_jpg = fid.read()
-        encoded_jpg_io = io.BytesIO(encoded_jpg)
-        image: Image = Image.open(encoded_jpg_io)
-        width, height = image.size
-        if image.format != 'JPEG':
-            raise ValueError('Image format not JPEG')
-        image_key = hashlib.sha256(encoded_jpg).hexdigest()
+        try:
+            with tf.io.gfile.GFile(str(img_path), 'rb') as fid:
+                encoded_jpg = fid.read()
+            encoded_jpg_io = io.BytesIO(encoded_jpg)
+            image: Image = Image.open(encoded_jpg_io)
+            width, height = image.size
+            if image.format != 'JPEG':
+                raise ValueError('Image format not JPEG')
+            image_key = hashlib.sha256(encoded_jpg).hexdigest()
+        except Exception as ex:
+            print("Error encoding image {}, image ignored".format(img_path))
+            return None
 
         # read mask
         mask = None
@@ -59,7 +63,7 @@ class Utilities:
         if annotations:
             if 'object' in annotations:
                 for obj in annotations['object']:
-                    class_name = obj['name']
+                    class_name = obj['name'].title()
                     class_id = labels_map[class_name]
                     xmin = float(obj['bndbox']['xmin'])
                     xmax = float(obj['bndbox']['xmax'])
