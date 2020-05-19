@@ -76,7 +76,7 @@ class ModelZoo:
         pipeline_model_path = LibUtil.pipelines_home(subfolder="tf").joinpath(filename)
         if not pipeline_model_path.exists():
             pipeline_model_path = FileUtil.download_file(pipeline_uri, pipeline_model_path, show_progress=True)
-        return str(pipeline_model_path)
+        return pipeline_model_path
 
     @classmethod
     @typeassert(model_name=str)
@@ -87,7 +87,7 @@ class ModelZoo:
         model_uri = available_models[model_name]
         if not checkpoint_model_path.exists():
             FileUtil.download_file(model_uri, checkpoint_model_path, unzip=True, show_progress=True)
-        return str(checkpoint_model_path)
+        return checkpoint_model_path
 
 
 
