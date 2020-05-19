@@ -11,7 +11,7 @@ from object_detection.protos import pipeline_pb2
 
 tf_logger = tf.get_logger()
 tf_logger.propagate = False
-from object_detection import model_hparams, model_lib, export_tflite_ssd_graph_lib
+from object_detection import model_hparams, model_lib, export_tflite_ssd_graph_lib, exporter
 from object_detection.builders import graph_rewriter_builder, dataset_builder, model_builder
 from object_detection.legacy import trainer
 from object_detection.utils.config_util import create_pipeline_proto_from_configs, get_configs_from_pipeline_file, \
@@ -160,7 +160,18 @@ class TfTrainableModel(ApiModel):
     @typeassert(checkpoint=int, out_folder=str)
     def freeze(self, checkpoint, out_folder: typing.Union[str, Path] = None):
         try:
-            pass
+            if out_folder:
+                frozen_model_dir = Path(out_folder)
+            else:
+                frozen_model_dir = self._out_folder.joinpath("export")
+            model_checkpoint = self._out_folder.joinpath("model.ckpt-{}".format(checkpoint))
+            exporter.export_inference_graph(
+                input_type="image_tensor",
+                pipeline_config=self._pipeline,
+                trained_checkpoint_prefix=str(model_checkpoint),
+                output_directory=str(frozen_model_dir),
+                input_shape=None,
+                write_inference_graph=False)
         except Exception as ex:
             raise Exception("Error freezing the model {}".format(ex)) from ex
         return super(TfTrainableModel, self).freeze()
