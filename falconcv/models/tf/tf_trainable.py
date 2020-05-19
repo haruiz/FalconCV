@@ -440,11 +440,10 @@ class TfTrainableModel(ApiModel):
                 frozen_model = list(self._out_folder.rglob("**/frozen_inference_graph.pb"))[0]
                 cmd = '''python "{}" 
                                 --input_model "{}" 
-                                --transformations_config  "{}" 
-                                --output_dir  "{}"   
-                                --data_type   {}                            
-                                --reverse_input_channels
-                                --input_shape "[1, {}, {}, 3]"
+                                --transformations_config "{}" 
+                                --output_dir "{}"   
+                                --data_type {}                            
+                                --reverse_input_channels                                
                                 --tensorflow_object_detection_api_pipeline_config "{}"                
                                     ''' \
                     .format(optimizer_script,
@@ -452,8 +451,6 @@ class TfTrainableModel(ApiModel):
                             front_openvino_file,
                             out_folder,
                             data_type,
-                            self.input_size[0],
-                            self.input_size[1],
                             model_config
                             )
                 cmd = " ".join([line.strip() for line in cmd.splitlines()])
