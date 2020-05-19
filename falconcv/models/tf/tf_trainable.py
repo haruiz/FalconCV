@@ -223,7 +223,7 @@ class TfTrainableModel(ApiModel):
             labels = set()
             for img in self._dataset:
                 for bounding_box in img.annotations["object"]:
-                    labels.add(bounding_box["name"].title())
+                    labels.add(bounding_box["name"].strip().title())
             self._labels_map = {l: i + 1 for i, l in enumerate(labels)}
         # update number of classes
         getattr(self.pipeline.model, self.arch).num_classes = len(self._labels_map)
@@ -356,7 +356,7 @@ class TfTrainableModel(ApiModel):
                       worker_job_name, is_chief, str(self._out_folder), graph_hook_fn=graph_rewriter_fn)
 
     @typeassert(checkpoint=int, out_folder=str, add_postprocessing_op=bool, use_regular_nms=bool,
-                max_classes_per_detection=int, input_size=tuple)
+                max_classes_per_detection=int)
     def to_tflite(self, checkpoint,
                   out_folder=None,
                   max_detections=10,
@@ -364,16 +364,14 @@ class TfTrainableModel(ApiModel):
                   use_regular_nms=True,
                   max_classes_per_detection=1):
         try:
-            assert self.arch() == "ssd", "This method is only supported for ssd models"
-            model_checkpoint = "{}/model.ckpt-{}".format(self._out_folder, checkpoint)
-            out_folder = out_folder if out_folder else self._out_folder
-            pipeline_config = pipeline_pb2.TrainEvalPipelineConfig()
-            with tf.gfile.GFile(self._pipeline_file, 'r') as f:
-                text_format.Merge(f.read(), pipeline_config)
+            assert self.arch == "ssd", "This method is only supported for ssd models"
+            model_checkpoint = str(self._out_folder.joinpath("model.ckpt-{}".format(checkpoint)))
+            tflite_model_folder = Path(out_folder) if out_folder else self._out_folder
+
             export_tflite_ssd_graph_lib.export_tflite_graph(
-                pipeline_config,
+                self._pipeline,
                 model_checkpoint,
-                out_folder,
+                str(tflite_model_folder),
                 add_postprocessing_op,
                 max_detections,
                 max_classes_per_detection, use_regular_nms=use_regular_nms)
@@ -388,8 +386,8 @@ class TfTrainableModel(ApiModel):
                        --inference_type=FLOAT --allow_custom_ops
                        ''' \
                 .format(
-                Path(out_folder).joinpath("tflite_graph.pb"),
-                Path(out_folder).joinpath("model.tflite"),
+                tflite_model_folder.joinpath("tflite_graph.pb"),
+                tflite_model_folder.joinpath("model.tflite"),
                 self.input_size[0], self.input_size[1]
             )
             cmd = " ".join([line.strip() for line in cmd.splitlines()])
@@ -398,7 +396,7 @@ class TfTrainableModel(ApiModel):
         except Exception as ex:
             raise Exception("Error converting the model {}".format(ex)) from ex
 
-    @typeassert(out_folder=str, device=str)
+    @typeassert(out_folder=str, device=str, force=bool)
     def to_OpenVINO(self, out_folder=None, device="CPU", pre_trained=False, force=False):
         try:
             assert "INTEL_OPENVINO_DIR" in os.environ, "OpenVINO workspace not initialized"

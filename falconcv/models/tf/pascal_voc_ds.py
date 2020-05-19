@@ -70,7 +70,7 @@ class PascalVOCImage:
         if self.annotations:
             if 'object' in self.annotations:
                 for obj in self.annotations['object']:
-                    class_name = obj['name'].title()
+                    class_name = obj['name'].strip().title()
                     class_id = labels_map[class_name]
                     xmin = float(obj['bndbox']['xmin'])
                     xmax = float(obj['bndbox']['xmax'])
