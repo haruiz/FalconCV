@@ -77,9 +77,9 @@ class TFModelZoo:
         pipeline_uri = available_pipelines[model_name]
         filename = Path(urlparse(pipeline_uri).path).name
         pipeline_model_path = LibUtil.pipelines_home(subfolder="tf").joinpath(filename)
-        pipeline_model_path = FileUtil.download_file(pipeline_uri, pipeline_model_path, show_progress=True)
-
-        return str(pipeline_model_path)
+        if not pipeline_model_path.exists():
+            pipeline_model_path = FileUtil.download_file(pipeline_uri, pipeline_model_path.parent, show_progress=True)
+        return pipeline_model_path
 
     @classmethod
     @typeassert(model_name=str)
@@ -90,8 +90,7 @@ class TFModelZoo:
         model_uri = available_models[model_name]
         if not checkpoint_model_path.exists():
             FileUtil.download_file(model_uri, checkpoint_model_path, unzip=True, show_progress=True)
-
-        return str(checkpoint_model_path)
+        return checkpoint_model_path
 
     @classmethod
     def print_available_models(cls, arch=None):

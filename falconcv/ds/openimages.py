@@ -72,6 +72,7 @@ class OpenImages(DatasetDownloader):
                         self.labels_map[label_id]=label_name
                     dds=dd.read_csv(classes_segmentation_txt).compute()
                     self.slabels_map ={row[0]: self.labels_map[row[0]] for _,row in dds.iterrows() if row[0] in self.labels_map}
+            return self
         except Exception as ex:
             logger.error("Error preparing the dataset : {} ".format(ex))
             raise ex
