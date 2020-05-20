@@ -61,8 +61,6 @@ class FileUtil:
                             for data in r.iter_content(block_size):
                                 t.update(len(data))
                                 f.write(data)
-                    if total_length != 0 and t.n != total_length:
-                        raise Exception("ERROR, something went wrong")
                 else:
                     r = requests.get(file_uri, stream=True)
                     with open(str(out_file), 'wb') as f:

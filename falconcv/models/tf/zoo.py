@@ -75,7 +75,7 @@ class ModelZoo:
         filename = Path(urlparse(pipeline_uri).path).name
         pipeline_model_path = LibUtil.pipelines_home(subfolder="tf").joinpath(filename)
         if not pipeline_model_path.exists():
-            pipeline_model_path = FileUtil.download_file(pipeline_uri, pipeline_model_path, show_progress=True)
+            pipeline_model_path = FileUtil.download_file(pipeline_uri, pipeline_model_path.parent, show_progress=True)
         return pipeline_model_path
 
     @classmethod
