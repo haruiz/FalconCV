@@ -12,7 +12,7 @@ class ModelBuilder:
             from falconcv.models.tf import APIModelFactory
             return APIModelFactory.create(model, labels_map, config)
         elif backend == DETECTRON:
-            from falconcv.models.detectron import DetectronModelFactory
-            return DetectronModelFactory.create(model, labels_map, config)
+            from falconcv.models.detectron import APIModelFactory
+            return APIModelFactory.create(model, labels_map, config)
         else:
             raise NotImplementedError("Invalid backend parameter")

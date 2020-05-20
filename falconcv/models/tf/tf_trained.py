@@ -12,7 +12,7 @@ from falconcv.decor import typeassert, pathassert
 from falconcv.models.api_model import ApiModel
 from .misc import BoundingBox
 from .util import Utilities
-from .tf_model_zoo import TFModelZoo
+from .zoo import ModelZoo
 from falconcv.util import ImageUtil
 import logging
 logger=logging.getLogger(__name__)
@@ -153,7 +153,7 @@ class TfSaveModel(TfTrainedModel):
     def __enter__(self):
         super(TfSaveModel, self).__enter__()
         if not os.path.isdir(self._model):
-            download_folder =TFModelZoo.download_model(self._model)
+            download_folder =ModelZoo.download_model(self._model)
             self._model = os.path.join(download_folder, "saved_model")
         self._tf_model=Utilities.load_save_model(self._model)
         return self

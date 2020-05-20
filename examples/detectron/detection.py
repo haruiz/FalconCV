@@ -5,7 +5,7 @@ sys.path.append('.')
 from falconcv.util import VIUtil
 from falconcv.cons import *
 from falconcv.models import ModelBuilder
-from falconcv.models.detectron import DetectronModelZoo
+from falconcv.models.detectron import ModelZoo
 
 
 def run_pretrained_model(pretrained_model, image):
@@ -22,7 +22,7 @@ def run_pretrained_model(pretrained_model, image):
 
 if __name__ == '__main__':
     # pick model from zoo
-    DetectronModelZoo.print_available_models(task="detection")
+    ModelZoo.print_available_models(task="detection")
 
     # run pre-trained model
     pretrained_model = "R101" # R101 / R50-FPN

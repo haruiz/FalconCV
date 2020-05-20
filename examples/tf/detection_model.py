@@ -4,7 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import sys
 sys.path.append('.')
 
-from falconcv.models.tf import TFModelZoo
+from falconcv.models.tf import ModelZoo
 from falconcv.ds import *
 from falconcv.util import FileUtil, VIUtil
 from falconcv.models import ModelBuilder
@@ -58,8 +58,8 @@ def make_predictions(frozen_model, labels_map_file, image):
 
 
 if __name__ == '__main__':
-    images_folder = "/mnt/D/Dev/falconcv/datasets/openimages/animals"
-    model_folder = "/mnt/D/Dev/falconcv/models/animals"
+    images_folder = "/home/haruiz/datasets/animals"
+    model_folder = "/home/haruiz/models/animals"
     labels_map = {
         "Bird": 1,
         "Eagle": 2,
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     create_dataset(images_folder, labels_map, n=500, batch_size=250)
 
     # pick model from zoo
-    TFModelZoo.print_available_models(arch="faster")
+    ModelZoo.print_available_models(arch="faster")
 
     # train model
     train_model("faster_rcnn_inception_v2_coco", images_folder, model_folder, labels_map)

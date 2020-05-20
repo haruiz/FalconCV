@@ -2,14 +2,14 @@ from detectron2 import model_zoo
 from detectron2.config import get_cfg, CfgNode
 from detectron2.engine import DefaultPredictor
 
-from falconcv.models.detectron import DetectronModelZoo
+from falconcv.models.detectron import ModelZoo
 
 
 class Utilities:
     @staticmethod
     def load_predictor(model: str, threshold: float, top_k: int) -> (CfgNode, DefaultPredictor):
         # get model info
-        model_info = DetectronModelZoo.get_model_info(model)
+        model_info = ModelZoo.get_model_info(model)
 
         # create configuration file
         cfg = get_cfg()
