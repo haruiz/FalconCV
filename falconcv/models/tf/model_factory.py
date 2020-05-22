@@ -1,11 +1,10 @@
-import os
 import logging
-
+import os
+logger = logging.getLogger(__name__)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from .tf_trainable import TfTrainableModel
 from .tf_trained import TfSaveModel, TfFreezeModel
 
-logger = logging.getLogger(__name__)
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 class APIModelFactory:
@@ -17,4 +16,4 @@ class APIModelFactory:
             else:
                 return TfSaveModel(model, labels_map)
         else:
-            return TfTrainableModel(config)  # model ready for training
+            return TfTrainableModel(config)  # model ready fro training
