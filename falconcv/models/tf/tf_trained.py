@@ -12,7 +12,7 @@ from falconcv.decor import typeassert, pathassert
 from falconcv.models.api_model import ApiModel
 from .misc import BoundingBox
 from .util import Utilities
-from .zoo import ModelZoo
+from .zoo import  ModelZoo
 from falconcv.util import ImageUtil
 import logging
 logger=logging.getLogger(__name__)

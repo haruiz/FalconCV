@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # creating the dataset
     create_dataset(images_folder, labels_map,color_palette, n=1000)
     # picking and training the model
-    ModelZoo.print_available_models(arch="mask") # check the models available
+    print(ModelZoo.available_models(arch="mask")) # check the models available
     train_model("mask_rcnn_inception_v2_coco",images_folder, model_folder, labels_map)
 
     #doing inference
