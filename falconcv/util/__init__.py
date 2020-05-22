@@ -6,3 +6,4 @@ from .vi_util import VIUtil
 from .img_util import ImageUtil
 from .color_util import ColorUtil
 from .misc_util import *
+from .config_util import ConfigUtil
