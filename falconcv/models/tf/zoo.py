@@ -89,6 +89,9 @@ class ModelZoo:
             FileUtil.download_file(model_uri, checkpoint_model_path, unzip=True, show_progress=True)
         return checkpoint_model_path
 
-
-
-
+    @classmethod
+    def print_available_models(cls, arch=None):
+        print("*** TensorFlow Detection Model Zoo ***")
+        models = cls.available_models(arch)
+        if models is not None:
+            _ = {model: print(f"  {model}") for model in models.keys()}
