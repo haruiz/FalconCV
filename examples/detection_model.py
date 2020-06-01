@@ -58,8 +58,8 @@ def make_predictions(frozen_model, labels_map_file, image):
 
 
 if __name__ == '__main__':
-    images_folder = "/home/haruiz/datasets/animals"
-    model_folder = "/home/haruiz/models/animals"
+    images_folder = "<your images folder path>"
+    model_folder = "<your model folder path>"
     labels_map = {
         "Bird": 1,
         "Eagle": 2,
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     create_dataset(images_folder, labels_map, n=500, batch_size=250)
 
     # pick model from zoo
-    ModelZoo.print_available_models(arch="faster")
+    print(ModelZoo.available_models(arch="faster"))  # check the models available
 
     # train model
     train_model("faster_rcnn_inception_v2_coco", images_folder, model_folder, labels_map)

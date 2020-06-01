@@ -113,11 +113,3 @@ class VIUtil:
         #fig.savefig('result_{}.png'.format(uuid.uuid4()), dpi=300, bbox_inches='tight')
         return fig
 
-    @staticmethod
-    def img_show(title: str, img: np.ndarray):
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        cv2.namedWindow(title, cv2.WINDOW_NORMAL)
-        cv2.resizeWindow(title, (800, 600))
-        cv2.imshow(title, img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
