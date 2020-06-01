@@ -5,17 +5,7 @@ import urllib.request
 import cv2
 from urllib.error import HTTPError
 
-
 class ImageUtil:
-    @staticmethod
-    def process_input_image(input_image, size=None):
-        img_arr, scale_factor = ImageUtil.read(input_image), 1  # read image
-        if size:
-            img_arr, scale_factor = ImageUtil.resize(img_arr, width=size[0], height=[1])  # resize image
-        img_height, img_width = img_arr.shape[:2]
-
-        return img_arr, img_width, img_height, scale_factor
-    
     @staticmethod
     def resize(image,width=None,height=None,inter=cv2.INTER_AREA):
         # initialize the dimensions of the image to be resized and
