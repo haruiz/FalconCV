@@ -1,0 +1,41 @@
+name: falconcv
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - nomkl
+  - cudatoolkit
+  - libgcc-ng
+  - libstdcxx-ng
+  - wxpython
+  - python=3.6.9
+  - pip
+  - jupyterlab
+  - tensorflow-gpu=1.15.0
+  - cython
+  - tf_slim
+  - pip:
+    - opt-einsum==2.3.2
+    - imagecodecs
+    - matplotlib
+    - numpy==1.17
+    - opencv-contrib-python
+    - pillow
+    - tqdm
+    - scipy
+    - requests
+    - clint
+    - validators
+    - more-itertools
+    - pandas
+    - imutils
+    - boto3
+    - "dask[complete]"
+    - lxml
+    - Mako
+    - colorlog
+    - colorama
+    - bs4
+    - pick
+    - scikit-learn
+    - gitpython

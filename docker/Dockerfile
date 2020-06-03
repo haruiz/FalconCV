@@ -29,7 +29,7 @@ WORKDIR /${ENV_NAME}
 COPY . .
 
 RUN source activate base \
-    && conda env create -f environment.yml \
+    && conda env create -f docker/environment.yml \
     && conda clean -afy \
     && sed -i 's/conda activate base/conda activate `${ENV_NAME}`/g' ~/.bashrc \
     && chmod -R ugo+w /opt/conda \
