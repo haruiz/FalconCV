@@ -21,6 +21,13 @@ logger = logging.getLogger(__name__)
 class FileUtil:
 
     @staticmethod
+    def get_files(path: Path, exts: list) -> list:
+        all_files = []
+        for ext in exts:
+            all_files.extend(path.rglob("**/*%s" % ext))
+        return all_files
+
+    @staticmethod
     def internet_on(url='http://www.google.com/', timeout=5):
         try:
             req = requests.get(url, timeout=timeout)

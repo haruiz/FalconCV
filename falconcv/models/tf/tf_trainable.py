@@ -206,11 +206,11 @@ class TfTrainableModel(ApiModel):
         self._mk_record_file(val_images, self._val_record_file, self._labels_map)
 
     def _load_dataset(self):
-        img_files = Utilities.get_files(self._images_folder, [".jpg", ".jpeg"])
-        xml_files = Utilities.get_files(self._xml_folder, [".xml"])
-        mask_files = Utilities.get_files(self._xml_folder, [".png"])
+        img_files = FileUtil.get_files(self._images_folder, [".jpg", ".jpeg"])
+        xml_files = FileUtil.get_files(self._xml_folder, [".xml"])
+        mask_files = FileUtil.get_files(self._xml_folder, [".png"])
         files = img_files + xml_files + mask_files
-        files = sorted(files, key=lambda img: img.name)
+        files = sorted(files, key=lambda img: img.stem)
         images_files = []
         for img_name, img_files in itertools.groupby(files, key=lambda img: img.stem):
             img_file, xml_file, mask_file = None, None, None

@@ -7,13 +7,6 @@ from object_detection.utils.config_util import create_pipeline_proto_from_config
 
 class Utilities:
     @staticmethod
-    def get_files(path: Path, exts: list) -> list:
-        all_files = []
-        for ext in exts:
-            all_files.extend(path.rglob("**/*%s" % ext))
-        return all_files
-
-    @staticmethod
     def load_save_model(model_path):
         model=tf.compat.v2.saved_model.load(model_path,None)
         return model.signatures['serving_default']

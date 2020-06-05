@@ -1,16 +1,18 @@
+import itertools
 import math
+import os
+import random
 from io import BytesIO
-
+from pathlib import Path
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
-
+from PIL import Image, ImageDraw, ImageFont
 #from .color_util import ColorUtil
 from matplotlib import patches
-
+from .file_util import FileUtil
 from .color_util import ColorUtil
-
+from lxml import objectify
 
 class VIUtil:
 
@@ -112,4 +114,77 @@ class VIUtil:
         #cv2.putText(rgb, label,(box.x1 + 10,box.y1 + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors[box.label],2)
         #fig.savefig('result_{}.png'.format(uuid.uuid4()), dpi=300, bbox_inches='tight')
         return fig
+
+    @staticmethod
+    def get_voc_annotations(image_path: str, xml_path: str):
+        '''
+        return the annotations of the image
+        :param image_path: image path
+        :return: a list with the bounding boxes
+        '''
+        try:
+            with open(xml_path) as f:
+                xml = f.read()
+            root = objectify.fromstring(xml)
+            boxes = []
+            for item in root.object:
+                xmin = item.bndbox.xmin
+                ymin = item.bndbox.ymin
+                xmax = item.bndbox.xmax
+                ymax = item.bndbox.ymax
+                boxes.append({
+                    "xmin": xmin,
+                    "ymin": ymin,
+                    "xmax": xmax,
+                    "ymax": ymax,
+                    "label": item.name
+                })
+            return boxes
+        except Exception as e:
+            print("Error reading the image {}".format(str(e)))
+
+    @classmethod
+    def make_grid(cls, images_folder, annotations_folder=None, n=10, rows=3, figsize = (10,5), fontsize=10):
+        import matplotlib
+        matplotlib.use('WXAgg')
+        import matplotlib.pylab as plt
+        images_folder = Path(images_folder)
+        assert images_folder.exists(), "images folder not found"
+        if annotations_folder is None:
+            annotations_folder = images_folder
+        img_files = FileUtil.get_files(images_folder, [".jpg", ".jpeg", ".png"])
+        xml_files = FileUtil.get_files(annotations_folder, [".xml"])
+        files = img_files + xml_files
+        files = sorted(files, key=lambda img: img.stem)
+        files = [(img_name,list(img_files)) for img_name, img_files in itertools.groupby(files, key=lambda img: img.stem)]
+        files = random.sample(files, k=n)
+        cols = math.ceil(n/rows)
+        fig = plt.figure(figsize=figsize)
+        annotations= {img_files[0]:
+                          cls.get_voc_annotations(str(img_files[0]), str(img_files[1]))
+                                for img_name, img_files in files}
+        labels = set([box["label"] for img_path, img_anns in annotations.items() for box in img_anns if box])
+        labels_colors = dict(zip(labels, ColorUtil.rainbow_rgb(len(labels))))
+        for i, (img_path, img_annotations) in enumerate(annotations.items()):
+            ax = fig.add_subplot(rows, cols, i +1)
+            ax.set_axis_off()
+            img = Image.open(img_path)
+            dctx = ImageDraw.Draw(img)  # create drawing context
+            for annot in img_annotations:
+                box = [(annot["xmin"],annot["ymin"]), (annot["xmax"], annot["ymax"])]
+                label = annot["label"]
+                color = labels_colors[label]
+                dctx.rectangle(box,outline=color, width=5)
+                ax.text(
+                    x=annot["xmin"] + 20,
+                    y=annot["ymin"] + 20,
+                    s=label,
+                    color="white",
+                    fontsize=12,
+                    bbox=dict(boxstyle="round",facecolor=np.array(color) / 255,alpha=0.9))
+            del dctx
+            ax.imshow(np.asarray(img))
+        plt.show()
+
+
 
