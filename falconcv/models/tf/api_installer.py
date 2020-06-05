@@ -42,21 +42,26 @@ class TFObjectDetectionAPI(ApiInstaller):
         protos_folder = research_folder.joinpath("object_detection", "protos")
         protos_files = glob.glob("{}/*.proto".format(str(protos_folder)))
         for abs_file_path in protos_files:
-            file_name = Path(abs_file_path).name
-            rel_file_path = "object_detection/protos/{}".format(file_name)
-            p = subprocess.Popen(
-                ['protoc', rel_file_path, "--python_out=."],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
-                cwd=str(research_folder))
-            output = p.stdout.readlines()
-            error = p.stderr.readlines()
-            if error:
-                raise IOError(error)
-            if output:
-                logger.debug(output)
-            p.wait()
+            try:
+                file_name = Path(abs_file_path).name
+                rel_file_path = "object_detection/protos/{}".format(file_name)
+                p = subprocess.Popen(
+                    ['protoc', rel_file_path, "--python_out=."],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    universal_newlines=True,
+                    cwd=str(research_folder))
+                output = p.stdout.readlines()
+                error = p.stderr.readlines()
+                if error:
+                    raise IOError(error)
+                if output:
+                    print(output)
+                    logger.debug(output)
+                p.wait()
+            except Exception as ex:
+                print(ex)
+                continue
 
 
 if __name__ == '__main__':
