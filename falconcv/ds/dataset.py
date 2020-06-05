@@ -72,7 +72,7 @@ class DatasetDownloader(metaclass=ABCMeta):
         #     self._dependencies = dask.compute(delayed_tasks)[0]
         logger.info("Downloading {} dataset dependencies, it can take a few minutes".format(type(self).__name__))
         for dep_name, dep_uri in self._remote_dep.items():
-            self._dependencies[dep_name] = FileUtil.download_file(dep_uri, self._home(), show_progress=True)
+            self._dependencies[dep_name] = FileUtil.download_file(dep_uri, self._home(), show_progress=True, unzip=True)
         logger.info("Download dependencies done")
 
     def _get_dependency(self, name):
