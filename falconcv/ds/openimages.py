@@ -50,7 +50,7 @@ class OpenImages(DatasetDownloader):
 
                 "train_annotations_bbox": "https://storage.googleapis.com/openimages/v6/oidv6-train-annotations-bbox.csv",
                 "test_annotations_bbox": "https://storage.googleapis.com/openimages/v5/test-annotations-bbox.csv",
-                "validation_annotations_bbox": "https://storage.googleapis.com/openimages/v5/test-annotations-bbox.csv",
+                "validation_annotations_bbox": "https://storage.googleapis.com/openimages/v5/validation-annotations-bbox.csv",
                 # "train_annotations_masks": "https://storage.googleapis.com/openimages/v5/train-annotations-object-segmentation.csv",
                 # "test_annotations_masks": "https://storage.googleapis.com/openimages/v5/test-annotations-object-segmentation.csv",
                 # "validation_annotations_mask": "https://storage.googleapis.com/openimages/v5/validation-annotations-object-segmentation.csv"
