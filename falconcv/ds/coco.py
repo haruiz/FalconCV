@@ -2,6 +2,7 @@ import math
 import os
 import logging
 import random
+from pathlib import Path
 
 import dask
 import more_itertools
@@ -132,12 +133,11 @@ class Coco(DatasetDownloader):
             assert task == "detection" or task=="segmentation","task not supported"
             assert split in ["train","validation"],"invalid split parameter"
             super(Coco, self).setup(split, task)
-            ann_file_uri=self._dependencies["annotations_file_uri"]
-            out_folder=FileUtil.unzip_file(ann_file_uri)
+            ann_zip_file: Path =self._dependencies["annotations_file_uri"]
+            ann_folder=ann_zip_file.parent.joinpath("annotations")
             ann_file_prefix="train" if split == "train" else "val"
-            ann_file=os.path.join(out_folder,"annotations", "instances_{}{}.json".format(ann_file_prefix, self._v))
-            ann_file = os.path.realpath(ann_file)
-            self._coco_api_client=COCO(ann_file)
+            ann_file=ann_folder.joinpath("instances_{}{}.json".format(ann_file_prefix, self._v))
+            self._coco_api_client=COCO(str(ann_file))
             cat_ids=self._coco_api_client.getCatIds()
             cats_info=self._coco_api_client.loadCats(cat_ids)
             self.labels_map={cat['name']:cat['id'] for cat in cats_info}
