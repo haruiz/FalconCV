@@ -31,12 +31,14 @@ COPY . .
 RUN source activate base \
     && conda env create -f docker/environment.yml \
     && conda clean -afy \
-    && sed -i 's/conda activate base/conda activate `${ENV_NAME}`/g' ~/.bashrc \
+    && sed -i 's/conda activate base/conda activate falconcv/g' ~/.bashrc \
     && chmod -R ugo+w /opt/conda \
     && source activate ${ENV_NAME} \
     && python setup.py install #Installs FalconCV on the env
 
-RUN mv docker/.run_in_falconcv.sh /.run_in_falconcv
+RUN mv docker/.run_in_falconcv.sh /.run_in_falconcv \
+    && chmod u+x /.run_in_falconcv \
+    && chmod u+x docker/start_jupyter.sh
 
 # Jupyter notebooks port
 EXPOSE 8888
