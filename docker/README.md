@@ -76,3 +76,6 @@ To use FalconCV and jupyter lab execute following command, it will share your $H
 docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 -v $HOME:$HOME falconcv
 ```
 
+## Go to your favorite browser and assuming you are running Docker on your local machine type:
+[http://localhost:8888/lab](localhost:8888/lab)
+
