@@ -1,5 +1,10 @@
 ![FalconCV Logo](assets/logo.png)
---------------------------------------
+
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+
+[![GitHub forks](https://img.shields.io/github/forks/haruiz/FalconCV.svg?style=social&label=Fork&maxAge=2592000)](https://GitHub.com/haruiz/FalconCV/network/)
+[![GitHub stars](https://img.shields.io/github/stars/haruiz/FalconCV.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/haruiz/FalconCV/stargazers/)
+[![GitHub watchers](https://img.shields.io/github/watchers/haruiz/FalconCV.svg?style=social&label=Watch&maxAge=2592000)](https://GitHub.com/haruiz/FalconCV/watchers/)
 
 # FalconCV
 
@@ -150,13 +155,23 @@ You can found the API documentation at <https://haruiz.github.io/FalconCV/>.
 
 # Roadmap
 
-[Detailed Roadmap](https://github.com/github/hub/projects/1)
+You can see the detailed [roadmap](https://github.com/github/hub/projects/1) here.
 
 # How to contribute
 
 Fork the repository and then run the steps from [Install FalconCV from GitHub source](#option-1-install-falconcv-from-github-source).
 
 Send a pull request!
+
+# Authors
+
+**[Henry Ruiz](https://github.com/haruiz)** - *Idea and Initial work*
+
+Thank all the contributors!
+
+<a href="https://github.com/haruiz/FalconCV/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=haruiz/FalconCV" />
+</a>
 
 # License
 
