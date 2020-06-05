@@ -86,6 +86,24 @@ class ColorUtil(object):
         return cls.__color_dict(list(zip(B,G,R)))
 
     @classmethod
+    def rainbow_rgb(cls, n):
+        cmap = cm.rainbow(np.linspace(0.0, 1.0, n))
+        R = list(map(lambda x: math.floor(x * 255), cmap[:, 0]))
+        G = list(map(lambda x: math.floor(x * 255), cmap[:, 1]))
+        B = list(map(lambda x: math.floor(x * 255), cmap[:, 2]))
+        return list(zip(R,G,B))
+
+    @classmethod
+    def rainbow_rgb_normalized(cls, n):
+        cmap = cm.rainbow(np.linspace(0.0, 1.0, n))
+        R = list(map(lambda x: math.floor(x ), cmap[:, 0]))
+        G = list(map(lambda x: math.floor(x ), cmap[:, 1]))
+        B = list(map(lambda x: math.floor(x ), cmap[:, 2]))
+        return list(zip(R, G, B))
+
+
+
+    @classmethod
     def rand_colors(cls,n):
         colors_hex=["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(n)]
         colors_rgb=np.array([cls.hex2RGB(x) for x in colors_hex])
