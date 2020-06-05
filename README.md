@@ -125,26 +125,19 @@ if __name__ == '__main__':
 
 ```python
 from falconcv.models import ModelBuilder
-from falconcv.util import VIUtil
-import falconcv as fcv
 
 if __name__ == '__main__':
     config = {
-        "model": "<model name>",
+        "model": "<model name from zoo>",
         "images_folder": "<images folder path>",
         "output_folder": "<model output folder>",
-        "labels_map": "<labels map as a dict or a file>",
+        "labels_map": "<labels map as a dict or file>",
     }
     with ModelBuilder.build(config=config) as model:
-        model.train(epochs=2000,
-                    val_split=0.3,
-                    clear_folder=False)
-        # for freezing the model
-        model.freeze(chekpoint=epochs)
+        model.train(epochs=2000,val_split=0.3,clear_folder=False)
 ```
 
 For more detailed info visit the [documentation](https://haruiz.github.io/FalconCV/).
-
 Also, you can open the Colab demo:
 
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Q_l7RsAFiITJVj8yOMLR0yVNf97T7r43)
@@ -159,16 +152,12 @@ You can see the detailed [roadmap](https://github.com/github/hub/projects/1) her
 
 # How to contribute
 
-Fork the repository and then run the steps from [Install FalconCV from GitHub source](#option-1-install-falconcv-from-github-source).
+We are encouraging anyone around the world to contribute to this project. So, we principally need help improving the documentation, translation to other languages (which includes but not limited to French, Spanish, Portuguese, Arabian, and more) or adding new features.
+Fork the repository and run the steps from [Install FalconCV from GitHub source](#option-1-install-falconcv-from-github-source). Any questions, do not hesitate to write an email to henryruiz22@gmail.com. We are excited to see where this project goes.
 
 Send a pull request!
 
-# Authors
-
-**[Henry Ruiz](https://github.com/haruiz)** - *Idea and Initial work*
-
-Thank all the contributors!
-
+# Contributors
 <a href="https://github.com/haruiz/FalconCV/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=haruiz/FalconCV" />
 </a>
@@ -178,3 +167,17 @@ Thank all the contributors!
 Free software: [MIT license](LICENSE)
 
 Citation: haruiz. FalconCV. Git Code (2020). <https://github.com/haruiz/FalconCV/>
+
+# Citation
+
+```commandline
+@misc {FalconCV,
+    author = "Henry Ruiz, David Lopera",
+    title  = "FalconCV, an open-source transfer learning library that offers developers an interface to interact with some of the most popular computer vision frameworks",
+    url    = "https://github.com/haruiz/FalconCV",
+    month  = "jun",
+    year   = "2020--"
+}
+```
+# Credits
+- [Speed/accuracy trade-offs for modern convolutional object detectors.](https://arxiv.org/abs/1611.10012)
