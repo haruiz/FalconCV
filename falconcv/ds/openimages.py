@@ -142,14 +142,22 @@ class OpenImages(DatasetDownloader):
     def fetch(self,
               n = None,
               labels=None,
-              batch_size: int = 200):
+              batch_size: int = 200,
+              is_truncated=False,
+              is_depiction=False,
+              is_occluded=False
+              ):
         try:
             valid_labels=self._valid_labels(labels)
             annotations_file=self._get_annotation_file()
             ann_df=dd.read_csv(annotations_file,assume_missing=True)
             for class_id,class_name in valid_labels.items():
                 logger.info("downloading images for : {}".format(class_name))
-                ddc = ann_df[(ann_df["LabelName"] == class_id)]
+                ddc = ann_df[
+                    (ann_df["LabelName"] == class_id) &
+                    (ann_df["IsTruncated"] == is_truncated) &
+                    (ann_df['IsDepiction'] == is_depiction) &
+                    (ann_df['IsOccluded'] == is_occluded)]
                 images = ddc.compute().groupby("ImageID")
                 if n: images = more_itertools.take(n, images)
                 number_of_batches = math.ceil(len(images) / batch_size)
