@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 class TFObjectDetectionAPI(ApiInstaller):
     def __init__(self):
         super(TFObjectDetectionAPI, self).__init__()
-        self.repo_uri = "https://github.com/tensorflow/models.git"
+        self.repo_uri = "https://github.com/haruiz/models.git"
+        #"https://github.com/tensorflow/models.git"
         self._package_name = "object_detection"
 
 
