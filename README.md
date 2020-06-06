@@ -61,13 +61,12 @@ pip install bs4
 pip install pick
 pip install -U scikit-learn
 pip install gitpython
-
+conda install -c anaconda wxpython
 ```
 
 **Linux:**
 
 ```bash
-conda install -c anaconda wxpython
 sudo apt install protobuf-compiler
 pip install pycocotools
 ```
