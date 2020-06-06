@@ -65,7 +65,7 @@ Finally you are ready to Build and Run your FalconCV image
 The Dockerfiles can be built from the root project directory with the following command:
 
 ```shell script
-docker build -t falconcv -f docker/Dockerfile .
+docker build -t haruiz/falconcv -f docker/Dockerfile .
 ```
 
 # Run your Container
@@ -73,9 +73,10 @@ docker build -t falconcv -f docker/Dockerfile .
 To use FalconCV and jupyter lab execute following command, it will share your $HOME to your container, also
 
 ```shell script
-docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 -v $HOME:$HOME falconcv
+docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 -v $HOME:$HOME haruiz/falconcv
 ```
 
 ## Go to your favorite browser and assuming you are running Docker on your local machine type:
-[http://localhost:8888/lab](localhost:8888/lab)
+
+Link: [http://localhost:8888/lab](localhost:8888/lab)
 
