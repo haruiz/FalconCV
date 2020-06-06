@@ -31,7 +31,7 @@ logger.setLevel(logging.DEBUG)
 
 # constants
 name="falconcv"
-__version__="1.0.6"
+__version__="1.0.22"
 os.environ[
     "TF_OBJECT_DETECTION_MODEL_ZOO_URI"]=r"https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md"
 os.environ[

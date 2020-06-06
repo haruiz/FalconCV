@@ -114,3 +114,4 @@ studio.db-wal
 test.py
 .vs
 extra/
+.vscode/

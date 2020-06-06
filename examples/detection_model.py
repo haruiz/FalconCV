@@ -50,7 +50,6 @@ def train_model(model_name, images_folder, out_folder, labels_map, epochs=5000):
 def make_predictions(frozen_model, labels_map_file, image):
     # load freeze model
     with ModelBuilder.build(frozen_model, labels_map_file) as model:
-        print(image)
         img, predictions = model.predict(image, threshold=0.5)
         import matplotlib
         matplotlib.use('WXAgg')
@@ -69,7 +68,7 @@ if __name__ == '__main__':
     create_dataset(images_folder, labels_map, n=500, batch_size=250)
 
     # pick model from zoo
-    print(ModelZoo.available_models(arch="faster"))  # check the models available
+    ModelZoo.print_available_models(arch="faster")
 
     # train model
     train_model("faster_rcnn_inception_v2_coco", images_folder, model_folder, labels_map)
