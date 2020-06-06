@@ -412,11 +412,11 @@ class TfTrainableModel(ApiModel):
             # define data type
             data_type = "FP16" if device == "MYRIAD" else "FP32"
             if self._model_name.startswith("faster"):
-                front_openvino_file = "faster_rcnn_support.json"
+                front_openvino_file = "faster_rcnn_support_api_v1.15.json"
             elif self._model_name.startswith("ssd"):
-                front_openvino_file = "ssd_v2_support.json"
+                front_openvino_file = "ssd_support_api_v1.15.json"
             elif self._model_name.startswith("mask"):
-                front_openvino_file = "mask_rcnn_support.json"
+                front_openvino_file = "mask_rcnn_support_api_v1.15.json"
             elif self._model_name.startswith("rfcn"):
                 front_openvino_file = "rfcn_support.json"
             else:
