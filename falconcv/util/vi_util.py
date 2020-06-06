@@ -74,10 +74,6 @@ class VIUtil:
 
     @classmethod
     def imshow(cls,img,boxes, alpha=0.3):
-        import matplotlib
-        matplotlib.use('WXAgg')
-        import matplotlib.pylab as plt
-
         labels=np.unique([box.label for box in boxes])
         colors_dict=ColorUtil.rainbow(len(labels))
         R=np.asarray(colors_dict["r"], dtype=np.float) / 255.0
