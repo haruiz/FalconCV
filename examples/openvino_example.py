@@ -72,31 +72,29 @@ def preprocess(input_image, height, width):
     return image
 
 def test_fps_with_falcon(frozen_model,label_map, video_path):
-    import tensorflow as tf
-    with tf.device('/cpu:0'):
-        vs = FileVideoStream(video_path).start()
-        time.sleep(2.0)
-        fps = FPS().start()
-        with ModelBuilder.build(frozen_model, label_map) as model:
-            while vs.more():
-                frame = vs.read()
-                if not vs.more():
-                    continue
-                frame, boxes = model.predict(frame, threshold=0.5, top_k=10)
-                for box in boxes:
-                    draw_box(frame, None, box.x1, box.y1, box.x2, box.y2)
-                cv2.imshow("Frame", frame)
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord("q"):
-                    break
-                # update the fps counter
-                fps.update()
-            # stop the timer and display the information
-            fps.stop()
-            print("[INFO] elapsed time : {:.2f}".format(fps.elapsed()))
-            print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-            cv2.destroyAllWindows()
-            vs.stop()
+    vs = FileVideoStream(video_path).start()
+    time.sleep(2.0)
+    fps = FPS().start()
+    with ModelBuilder.build(frozen_model, label_map) as model:
+        while vs.more():
+            frame = vs.read()
+            if not vs.more():
+                continue
+            frame, boxes = model.predict(frame, threshold=0.5, top_k=10)
+            for box in boxes:
+                draw_box(frame, None, box.x1, box.y1, box.x2, box.y2)
+            cv2.imshow("Frame", frame)
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord("q"):
+                break
+            # update the fps counter
+            fps.update()
+        # stop the timer and display the information
+        fps.stop()
+        print("[INFO] elapsed time : {:.2f}".format(fps.elapsed()))
+        print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+        cv2.destroyAllWindows()
+        vs.stop()
 
 def test_fps_openvino(ir_model,label_map, video_path, device="CPU"):
     from openvino.inference_engine import IENetwork, IECore
@@ -136,7 +134,6 @@ def test_fps_openvino(ir_model,label_map, video_path, device="CPU"):
         res = exec_net.infer({input_blob_img: frame_tensor, input_blob_info: [w, h, 1]})
         res = res[output_name]
         for pred in res[0, 0, :, :]:
-            class_id = np.int(pred[1])
             confidence = pred[2]
             box = pred[3:]
             if confidence > 0.5:
@@ -165,7 +162,7 @@ if __name__ == '__main__':
     model_name = "faster_rcnn_inception_v2_coco"
     # create the dataset
     #create_dataset(images_folder, labels=["Eagle"], n=1000, batch_size=250)
-    # train model
+    # train model+
     #train_model("faster_rcnn_inception_v2_coco", images_folder, epochs=1000)
     frozen_model = list(Path("./models").rglob("frozen_inference_graph.pb"))[0]
     openVINO_model = list(Path("./models").rglob("frozen_inference_graph.xml"))[0]

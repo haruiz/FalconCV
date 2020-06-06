@@ -78,8 +78,8 @@ pip install pycocotools-win
 conda install tensorflow-gpu==1.15.0
 ```
 
-## Install FalconCV from PyPi (test)
+## Install FalconCV from Github
 
 ```console
-pip install -i https://test.pypi.org/simple/ falconcv
+pip uninstall falconcv -y && pip install git+https://github.com/haruiz/FalconCV.git
 ```
