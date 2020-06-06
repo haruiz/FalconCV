@@ -1,20 +1,19 @@
 import abc
+import logging
 import os
+import typing
 from pathlib import Path
 
-import cv2
 import numpy as np
 import tensorflow as tf
-import typing
 from object_detection.utils import ops as utils_ops
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
+
 from falconcv.decor import typeassert, pathassert
 from falconcv.models.api_model import ApiModel
-from .misc import BoundingBox
+from falconcv.util import ImageUtil, BoundingBox
 from .util import Utilities
 from .zoo import ModelZoo
-from falconcv.util import ImageUtil
-import logging
 
 logger = logging.getLogger(__name__)
 

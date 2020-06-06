@@ -6,8 +6,6 @@ import subprocess
 from pathlib import Path
 
 import tensorflow as tf
-from google.protobuf import text_format
-from object_detection.protos import pipeline_pb2
 
 tf_logger = tf.get_logger()
 tf_logger.propagate = False
@@ -24,10 +22,7 @@ from falconcv.models.api_model import ApiModel
 from falconcv.util import FileUtil
 from .zoo import ModelZoo
 
-
-
 import dask
-from .util import Utilities
 import typing
 
 from .pascal_voc_ds import PascalVOCImage, PascalVOCDataset
