@@ -122,29 +122,32 @@ class VIUtil:
         return fig
 
     @staticmethod
-    def get_voc_annotations(image_path: str, xml_path: str=None, mask_path=None):
+    def get_voc_annotations(image_path: str, xml_path: str=None, mask_path=None, labels_map =None):
         '''
         return the annotations of the image
         :param image_path: image path
         :return: a list with the bounding boxes
         '''
-        image_path = Path(image_path)
-        file_name = image_path.stem
-        if xml_path is None:
-            xml_path = str(image_path.parent.joinpath("{}.xml".format(file_name)))
-        if mask_path is None:
-            mask_path = str(image_path.parent.joinpath("{}.png".format(file_name)))
-
-        mask_image = None
-        if mask_path:
-            with open(mask_path, 'rb') as fid:
-                encoded_mask_png = fid.read()
-            encoded_png_io = io.BytesIO(encoded_mask_png)
-            mask_image = Image.open(encoded_png_io)
-            if mask_image.format != 'PNG':
-                raise ValueError('Mask image format not PNG')
-            mask_image = np.asarray(mask_image)
         try:
+            image_path = Path(image_path)
+            file_name = image_path.stem
+            if xml_path is None:
+                xml_path = str(image_path.parent.joinpath("{}.xml".format(file_name)))
+
+            mask_numpy = None
+            try:
+                if mask_path:
+                    with open(mask_path, 'rb') as fid:
+                        encoded_mask_png = fid.read()
+                    encoded_png_io = io.BytesIO(encoded_mask_png)
+                    pil_mask = Image.open(encoded_png_io)
+                    if pil_mask.format != 'PNG':
+                        raise ValueError('Mask image format not PNG')
+                    mask_numpy = np.asarray(pil_mask)
+            except Exception as ex:
+                raise Exception("error reading the image")
+
+            # load image
             with open(xml_path) as f:
                 xml = f.read()
             root = objectify.fromstring(xml)
@@ -154,24 +157,28 @@ class VIUtil:
                 ymin = item.bndbox.ymin
                 xmax = item.bndbox.xmax
                 ymax = item.bndbox.ymax
+                label = str(item.name)
                 box = BoundingBox(
                     x1=xmin,
                     x2=xmax,
                     y1=ymin,
                     y2=ymax,
-                    label=item.name
+                    label=label.title()
                 )
                 boxes.append(box)
-                if isinstance(mask_image, np.ndarray):
-                    pass
-                    #box.mask = mask_image[mask_image==]
+                if isinstance(mask_numpy, np.ndarray) and labels_map:
+                    if label in labels_map:
+                        class_id = labels_map[label]
+                        binary_mask = np.zeros_like(mask_numpy)
+                        binary_mask[mask_numpy == class_id] = 1
+                        box.mask = binary_mask
                 boxes.append(box)
             return boxes
         except Exception as e:
             print("Error reading the image {}".format(str(e)))
 
     @classmethod
-    def make_grid(cls, images_folder, annotations_folder=None, masks_folder = None, n=4, rows=2, figsize = (10,10), fontsize=10):
+    def make_grid(cls, images_folder, annotations_folder=None, masks_folder = None, n=4, rows=2, figsize = (10,10), fontsize=10, labels_map=None):
         import matplotlib
         matplotlib.use('WXAgg')
         import matplotlib.pylab as plt
@@ -190,39 +197,47 @@ class VIUtil:
         files = [(img_name,list(img_files)) for img_name, img_files in itertools.groupby(files, key=lambda img: img.stem)]
         files = random.sample(files, k=n)
         cols = math.ceil(n / rows)
+        if labels_map:
+            labels_map = {k.title():v for k,v in labels_map.items()}
+
         # load annotations
         annotations_dict = {}
         for img_name, img_files in files:
-            # detection
             if len(img_files) >= 2:
                 img_path = img_files[0]
                 xml_path = img_files[1]
                 mask_path = None
-                # segmentation
                 if len(img_files) == 3:
                     mask_path = img_files[2]
-                annotations_dict[img_path] = cls.get_voc_annotations(img_path, xml_path, mask_path)
+                annotations_dict[img_path] = cls.get_voc_annotations(img_path, xml_path, mask_path, labels_map)
 
+        assert len(annotations_dict) > 0, "Not annotations found"
         labels = set([box.label for boxes in annotations_dict.values() for box in boxes ])
         labels_colors = dict(zip(labels, ColorUtil.rainbow_rgb(len(labels))))
 
         # show annotations
         fig = plt.figure(figsize=figsize)
         for i, (img_path, img_boxes) in enumerate(annotations_dict.items()):
+            pil_image: Image = Image.open(img_path)
+            image_numpy = np.asarray(pil_image).copy()
+            # create figure
             ax = fig.add_subplot(rows, cols, i + 1)
             ax.set_axis_off()
-            img = Image.open(img_path)
-            # create drawing context
-            dctx = ImageDraw.Draw(img)
-            for annot in img_boxes:
-                box = [(annot.x1, annot.y1), (annot.x2, annot.y2)]
-                label = annot.label
+            for box in img_boxes:
+                label = box.label
                 color = labels_colors[label]
-                dctx.rectangle(box, outline=color, width=5)
-                print(annot.mask)
-                if annot.mask:
-                    print("here")
-                    cls.draw_mask(img, annot.mask,color)
+                ax.add_patch(
+                    patches.Rectangle(
+                        (box.x1, box.y1),
+                        box.x2 - box.x1,
+                        box.y2 - box.y1,
+                        linewidth=3,
+                        edgecolor=np.asarray(color) /255,
+                        facecolor='none',
+                        fill=False
+                    ))
+                if isinstance(box.mask, np.ndarray) and labels_map:
+                    cls.draw_mask(image_numpy, box.mask,color)
                 # ax.text(
                 #     x=box[0][0] + 20,
                 #     y=box[0][1] + 20,
@@ -230,8 +245,8 @@ class VIUtil:
                 #     color="white",
                 #     fontsize=12,
                 #     bbox=dict(boxstyle="round", facecolor=np.array(color) / 255, alpha=0.9))
-            del dctx
-            ax.imshow(np.asarray(img))
+
+            ax.imshow(image_numpy)
         plt.show()
 
 
