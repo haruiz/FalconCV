@@ -37,7 +37,8 @@ setuptools.setup(
         'pick',
         'scikit-learn',
         'gitpython',
-        'omegaconf'
+        'omegaconf',
+        "wxPython"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
