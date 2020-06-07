@@ -148,7 +148,7 @@ You can found the API documentation at <https://haruiz.github.io/FalconCV/>.
 
 # Roadmap
 
-You can see the detailed [roadmap](https://github.com/github/hub/projects/1) here.
+You can see the detailed [roadmap](https://github.com/haruiz/FalconCV/projects/1) here.
 
 # How to contribute
 
