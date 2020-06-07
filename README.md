@@ -162,12 +162,6 @@ Send a pull request!
   <img src="https://contributors-img.web.app/image?repo=haruiz/FalconCV" />
 </a>
 
-# License
-
-Free software: [MIT license](LICENSE)
-
-Citation: haruiz. FalconCV. Git Code (2020). <https://github.com/haruiz/FalconCV/>
-
 # Citation
 
 ```commandline
@@ -181,3 +175,6 @@ Citation: haruiz. FalconCV. Git Code (2020). <https://github.com/haruiz/FalconCV
 ```
 # Credits
 - [Speed/accuracy trade-offs for modern convolutional object detectors.](https://arxiv.org/abs/1611.10012)
+
+# License
+Free software: [MIT license](LICENSE)
