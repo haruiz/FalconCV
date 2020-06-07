@@ -21,6 +21,13 @@ logger = logging.getLogger(__name__)
 class FileUtil:
 
     @staticmethod
+    def get_files(path: Path, exts: list) -> list:
+        all_files = []
+        for ext in exts:
+            all_files.extend(path.rglob("**/*%s" % ext))
+        return all_files
+
+    @staticmethod
     def internet_on(url='http://www.google.com/', timeout=5):
         try:
             req = requests.get(url, timeout=timeout)
@@ -47,7 +54,7 @@ class FileUtil:
             out_file = out_folder.joinpath(remote_file_name)
             # dont download the file if it already exists
             if not out_file.exists() or force:
-                logger.info("[INFO]: downloading file : {}".format(file_uri))
+                logger.debug("[INFO]: downloading file : {}".format(file_uri))
                 if show_progress:
                     r = requests.get(file_uri, stream=True)
                     total_length = int(r.headers.get('content-length'))
@@ -67,7 +74,7 @@ class FileUtil:
                         for data in r.iter_content():
                             f.write(data)
 
-                logger.info("[INFO]: File download done")
+                logger.debug("[INFO]: File ({}) download done".format(file_uri))
             if unzip and out_file.suffix in [".gz", ".zip"]:
                 #unzip_out_folder_name = remote_file_name[:remote_file_name.find('.')]
                 #unzip_out_folder = out_folder.joinpath(unzip_out_folder_name)

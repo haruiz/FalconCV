@@ -120,7 +120,8 @@ class TaggedImage:
                     pts = list(zip(x, y))
                     if len(pts) > 0:
                         if labels_map:
-                            class_name = region.region_attributes["name"]
+                            labels_map = {k.title():v for k,v in labels_map.items()}
+                            class_name = region.region_attributes["name"].title()
                             if class_name in labels_map:
                                 drawable_image = ImageDraw.Draw(mask)
                                 label_id = labels_map[class_name]

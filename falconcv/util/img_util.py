@@ -55,11 +55,11 @@ class ImageUtil:
         if isinstance(image,str):
             if os.path.isfile(image):
                 image_arr = cv2.imread(image,cv2.IMREAD_COLOR)
+                image_arr = cv2.cvtColor(image_arr, cv2.COLOR_BGR2RGB)
             elif validators.url(image):
                 image_arr = cls.url2img(image)
             else:
                 raise IOError("Invalid image")
-            image_arr=cv2.cvtColor(image_arr,cv2.COLOR_BGR2RGB)
         elif isinstance(image, np.ndarray):
             image_arr = image
         return image_arr

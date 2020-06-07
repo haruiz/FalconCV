@@ -57,7 +57,7 @@ class PascalVOCImage:
                 mask = Image.open(encoded_png_io)
                 width, height = mask.size
                 if mask.format != 'PNG':
-                    raise ValueError('Image format not PNG')
+                    raise ValueError('Mask image format not PNG')
                 mask = np.asarray(mask)
         except Exception as ex:
             logger.warn("Error encoding the mask file {}, image ignored".format(self.img_path))

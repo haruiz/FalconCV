@@ -5,6 +5,7 @@ import dask
 from dask import delayed
 from dask.diagnostics import ProgressBar
 import logging
+
 logger = logging.getLogger(__name__)
 from falconcv.util import LibUtil, FileUtil
 
@@ -63,13 +64,15 @@ class DatasetDownloader(metaclass=ABCMeta):
 
     def _download_dependencies(self):
         """Download the dataset dependencies"""
-        delayed_tasks = {}
-        for dep_name, dep_uri in self._remote_dep.items():
-            task = delayed(FileUtil.download_file)(dep_uri, self._home())
-            delayed_tasks[dep_name] = task
+        # delayed_tasks = {}
+        # for dep_name, dep_uri in self._remote_dep.items():
+        #     task = delayed(FileUtil.download_file)(dep_uri, self._home())
+        #     delayed_tasks[dep_name] = task
+        # with ProgressBar():
+        #     self._dependencies = dask.compute(delayed_tasks)[0]
         logger.info("Downloading {} dataset dependencies, it can take a few minutes".format(type(self).__name__))
-        with ProgressBar():
-            self._dependencies = dask.compute(delayed_tasks)[0]
+        for dep_name, dep_uri in self._remote_dep.items():
+            self._dependencies[dep_name] = FileUtil.download_file(dep_uri, self._home(), show_progress=True, unzip=True)
         logger.info("Download dependencies done")
 
     def _get_dependency(self, name):

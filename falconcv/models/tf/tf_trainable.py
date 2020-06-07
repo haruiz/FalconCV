@@ -6,8 +6,6 @@ import subprocess
 from pathlib import Path
 
 import tensorflow as tf
-from google.protobuf import text_format
-from object_detection.protos import pipeline_pb2
 
 tf_logger = tf.get_logger()
 tf_logger.propagate = False
@@ -23,11 +21,9 @@ from falconcv.decor import typeassert
 from falconcv.models.api_model import ApiModel
 from falconcv.util import FileUtil
 from .zoo import ModelZoo
-
-
+from .util import Utilities
 
 import dask
-from .util import Utilities
 import typing
 
 from .pascal_voc_ds import PascalVOCImage, PascalVOCDataset
@@ -206,11 +202,11 @@ class TfTrainableModel(ApiModel):
         self._mk_record_file(val_images, self._val_record_file, self._labels_map)
 
     def _load_dataset(self):
-        img_files = Utilities.get_files(self._images_folder, [".jpg", ".jpeg"])
-        xml_files = Utilities.get_files(self._xml_folder, [".xml"])
-        mask_files = Utilities.get_files(self._xml_folder, [".png"])
+        img_files = FileUtil.get_files(self._images_folder, [".jpg", ".jpeg"])
+        xml_files = FileUtil.get_files(self._xml_folder, [".xml"])
+        mask_files = FileUtil.get_files(self._xml_folder, [".png"])
         files = img_files + xml_files + mask_files
-        files = sorted(files, key=lambda img: img.name)
+        files = sorted(files, key=lambda img: img.stem)
         images_files = []
         for img_name, img_files in itertools.groupby(files, key=lambda img: img.stem):
             img_file, xml_file, mask_file = None, None, None
@@ -413,19 +409,11 @@ class TfTrainableModel(ApiModel):
             assert "INTEL_OPENVINO_DIR" in os.environ, "OpenVINO workspace not initialized"
             OpenVINO_dir = Path(os.environ["INTEL_OPENVINO_DIR"])
             out_folder = out_folder if out_folder else self._out_folder
-
             # define data type
             data_type = "FP16" if device == "MYRIAD" else "FP32"
-            if self._model_name.startswith("faster"):
-                front_openvino_file = "faster_rcnn_support.json"
-            elif self._model_name.startswith("ssd"):
-                front_openvino_file = "ssd_v2_support.json"
-            elif self._model_name.startswith("mask"):
-                front_openvino_file = "mask_rcnn_support.json"
-            elif self._model_name.startswith("rfcn"):
-                front_openvino_file = "rfcn_support.json"
-            else:
-                raise Exception("model not supported yet")
+            model_arch = self._model_name.split("_")[0]
+            front_openvino_file = Utilities.get_openvino_front_file(model_arch)
+            logger.info("[INFO] front file picked:  {}".format(front_openvino_file))
             # define front file
             front_openvino_file = r"deployment_tools/model_optimizer/extensions/front/tf/{}".format(front_openvino_file)
             front_openvino_file = OpenVINO_dir.joinpath(front_openvino_file)
