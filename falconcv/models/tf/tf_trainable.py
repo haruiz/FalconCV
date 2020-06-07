@@ -21,6 +21,7 @@ from falconcv.decor import typeassert
 from falconcv.models.api_model import ApiModel
 from falconcv.util import FileUtil
 from .zoo import ModelZoo
+from .util import Utilities
 
 import dask
 import typing
@@ -408,19 +409,11 @@ class TfTrainableModel(ApiModel):
             assert "INTEL_OPENVINO_DIR" in os.environ, "OpenVINO workspace not initialized"
             OpenVINO_dir = Path(os.environ["INTEL_OPENVINO_DIR"])
             out_folder = out_folder if out_folder else self._out_folder
-
             # define data type
             data_type = "FP16" if device == "MYRIAD" else "FP32"
-            if self._model_name.startswith("faster"):
-                front_openvino_file = "faster_rcnn_support_api_v1.15.json"
-            elif self._model_name.startswith("ssd"):
-                front_openvino_file = "ssd_support_api_v1.15.json"
-            elif self._model_name.startswith("mask"):
-                front_openvino_file = "mask_rcnn_support_api_v1.15.json"
-            elif self._model_name.startswith("rfcn"):
-                front_openvino_file = "rfcn_support.json"
-            else:
-                raise Exception("model not supported yet")
+            model_arch = self._model_name.split("_")[0]
+            front_openvino_file = Utilities.get_openvino_front_file(model_arch)
+            logger.info("[INFO] front file picked:  {}".format(front_openvino_file))
             # define front file
             front_openvino_file = r"deployment_tools/model_optimizer/extensions/front/tf/{}".format(front_openvino_file)
             front_openvino_file = OpenVINO_dir.joinpath(front_openvino_file)

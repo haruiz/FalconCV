@@ -55,9 +55,9 @@ def convert_to_openVINO(model_name, images_folder):
             "images_folder": images_folder
         }
         with ModelBuilder.build(config=config) as model:
-            model.to_OpenVINO(device="CPU")
+            model.to_OpenVINO(device="CPU", force=True)
     except Exception as ex:
-        raise Exception("Error training the model {} ".format(ex)) from ex
+        raise Exception("Error training the model: {} ".format(ex)) from ex
 
 
 def draw_box(img, label, x, y, x_plus_w, y_plus_h):
@@ -167,9 +167,12 @@ if __name__ == '__main__':
     frozen_model = list(Path("./models").rglob("frozen_inference_graph.pb"))[0]
     openVINO_model = list(Path("./models").rglob("frozen_inference_graph.xml"))[0]
     label_map = list(Path("./models").rglob("label_map.pbtxt"))[0]
-    test_fps_with_falcon(str(frozen_model), str(label_map), "./../assets/video.mp4")
+    #test_fps_with_falcon(str(frozen_model), str(label_map), "./../assets/video.mp4")
 
-    #convert_to_openVINO("faster_rcnn_inception_v2_coco", images_folder)
+
+
+
+    convert_to_openVINO("faster_rcnn_inception_v2_coco", images_folder)
     #test_fps_openvino(openVINO_model, str(label_map), "./../assets/video.mp4")
 
 
