@@ -96,7 +96,7 @@ pip install -i https://test.pypi.org/simple/ falconcv
 ### OpenImages example
 
 ```python
-from falconcv.ds import *
+from falconcv.ds import OpenImages
 
 if __name__ == '__main__':
     # Create the dataset
