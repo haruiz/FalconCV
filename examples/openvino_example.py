@@ -1,17 +1,15 @@
 import os
+# video test
+import time
 from pathlib import Path
 
-from falconcv.models.tf import ModelZoo
-from falconcv.ds import *
-from falconcv.util import FileUtil, VIUtil, ColorUtil, ImageUtil
-from falconcv.models import ModelBuilder
-import numpy as np
-#video test
-import time
 import cv2
-import imutils
+import numpy as np
+from imutils.video import FPS, FileVideoStream
+
+from falconcv.ds import OpenImages
 from falconcv.models import ModelBuilder
-from imutils.video import VideoStream, FPS, FileVideoStream
+from falconcv.util import FileUtil
 
 
 def create_dataset(images_folder, labels, n, batch_size):
@@ -97,7 +95,7 @@ def test_fps_with_falcon(frozen_model,label_map, video_path):
         vs.stop()
 
 def test_fps_openvino(ir_model,label_map, video_path, device="CPU"):
-    from openvino.inference_engine import IENetwork, IECore
+    from openvino.inference_engine import IECore
     file_name = ir_model.stem
     xml_model_file = ir_model.parent.joinpath("{}.xml".format(file_name))
     bin_model_file = ir_model.parent.joinpath("{}.bin".format(file_name))
