@@ -83,8 +83,6 @@ pip install pycocotools-win
 
 - **TensorFlow:** `conda install tensorflow-gpu==1.15.0`
 
-5: 
-
 ## Option 2: Install FalconCV from PyPi (test):
 
 ```bash
