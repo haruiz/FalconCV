@@ -20,7 +20,7 @@ Additionally, taking advantage of the fantastic features that OpenVINO offers, a
 
 # Installation
 
-## Option 1. Install FalconCV from GitHub source:
+## Option 1: Install FalconCV from GitHub source:
 
 1 - Create and activate a conda environment:
 
@@ -32,7 +32,7 @@ conda create --name falconcv python=3.6
 
 ```bash
 git clone https://github.com/haruiz/FalconCV
-cd FalconCV folder
+cd FalconCV
 ```
 
 3 - Install dependencies:
@@ -83,11 +83,22 @@ pip install pycocotools-win
 
 - **TensorFlow:** `conda install tensorflow-gpu==1.15.0`
 
-## Option 2. Install FalconCV from PyPi (test):
+5: 
+
+## Option 2: Install FalconCV from PyPi (test):
 
 ```bash
 pip install -i https://test.pypi.org/simple/ falconcv
 ```
+
+## Option 3: Install FalconCV from github:
+
+```bash
+pip install git+https://github.com/haruiz/FalconCV.git
+```
+
+
+
 
 # Usage
 
