@@ -74,5 +74,5 @@ if __name__ == '__main__':
     frozen_model_file = os.path.join(model_folder, model, "export/frozen_inference_graph.pb")
     labels_map_file = os.path.join(model_folder, model, "label_map.pbtxt")
     from glob import glob
-    for image in glob("examples/images/*"):
+    for image in glob("../../examples/images/*"):
         make_predictions(frozen_model_file, labels_map_file, image)

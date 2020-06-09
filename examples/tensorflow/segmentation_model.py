@@ -71,4 +71,4 @@ if __name__ == '__main__':
     #doing inference
     frozen_model_file = os.path.join(model_folder, "export/frozen_inference_graph.pb")
     labels_map_file = os.path.join(model_folder, "label_map.pbtxt")
-    make_predictions(frozen_model_file, labels_map_file, "images/catsvrsbird2.jpeg")
+    make_predictions(frozen_model_file, labels_map_file, "../../examples/images/catsvrsbird2.jpeg")
