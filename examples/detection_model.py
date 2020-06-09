@@ -1,11 +1,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-import sys
-sys.path.append('.')
-
 from falconcv.models.tf import ModelZoo
-from falconcv.ds import *
+from falconcv.ds import OpenImages
 from falconcv.util import FileUtil, VIUtil
 from falconcv.models import ModelBuilder
 
