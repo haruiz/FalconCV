@@ -16,8 +16,9 @@ class TFObjectDetectionAPI(ApiInstaller):
     def __init__(self):
         super(TFObjectDetectionAPI, self).__init__()
         self.repo_uri = "https://github.com/haruiz/models.git"
-        # "https://github.com/tensorflow/models.git"
+        #"https://github.com/tensorflow/models.git"
         self._package_name = "object_detection"
+
 
     def install(self):
         try:
@@ -42,26 +43,21 @@ class TFObjectDetectionAPI(ApiInstaller):
         protos_folder = research_folder.joinpath("object_detection", "protos")
         protos_files = glob.glob("{}/*.proto".format(str(protos_folder)))
         for abs_file_path in protos_files:
-            try:
-                file_name = Path(abs_file_path).name
-                rel_file_path = "object_detection/protos/{}".format(file_name)
-                p = subprocess.Popen(
-                    ['protoc', rel_file_path, "--python_out=."],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    universal_newlines=True,
-                    cwd=str(research_folder))
-                output = p.stdout.readlines()
-                error = p.stderr.readlines()
-                if error:
-                    raise IOError(error)
-                if output:
-                    print(output)
-                    logger.debug(output)
-                p.wait()
-            except Exception as ex:
-                print(ex)
-                continue
+            file_name = Path(abs_file_path).name
+            rel_file_path = "object_detection/protos/{}".format(file_name)
+            p = subprocess.Popen(
+                ['protoc', rel_file_path, "--python_out=."],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+                cwd=str(research_folder))
+            output = p.stdout.readlines()
+            error = p.stderr.readlines()
+            if error:
+                raise IOError(error)
+            if output:
+                logger.debug(output)
+            p.wait()
 
 
 if __name__ == '__main__':
