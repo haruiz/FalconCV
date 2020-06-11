@@ -36,8 +36,7 @@ setuptools.setup(
         'bs4',
         'pick',
         'scikit-learn',
-        'gitpython',
-        'omegaconf'
+        'gitpython'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

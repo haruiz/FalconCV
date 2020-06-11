@@ -114,8 +114,8 @@ class PascalVOCImage:
         return None
 
 
-def PascalVOCGenerator(images, batch_size = 200):
-    for i,batch_of_images in enumerate(more_itertools.chunked(images,batch_size)):
+def PascalVOCGenerator(images, batch_size=200):
+    for i, batch_of_images in enumerate(more_itertools.chunked(images,batch_size)):
         yield batch_of_images
 
 
@@ -150,6 +150,3 @@ class PascalVOCDataset:
 
     def split(self, split_size=float):
         return train_test_split(self._images, test_size=split_size, random_state=42, shuffle=True)
-
-
-
