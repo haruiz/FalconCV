@@ -20,6 +20,6 @@ if __name__ == '__main__':
 
     # run pre-trained model
     pretrained_model = "R101"  # R101 / R50-FPN
-    # image = "../../examples/images/falcon.jpg"
-    image = "../../examples/images/zebrahorse.png"
+    image = "../../examples/images/falcon.jpg"
+    # image = "../../examples/images/zebrahorse.png"
     run_pretrained_model(pretrained_model, image)

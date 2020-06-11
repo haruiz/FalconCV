@@ -10,7 +10,7 @@ from detectron2.utils.visualizer import Visualizer
 from falconcv.models import ApiModel, ModelConfig
 from falconcv.decor import typeassert
 from falconcv.util.img_util import ImageUtil
-from .util import Utilities
+from .config import DtConfig
 
 logger = logging.getLogger(__name__)
 setup_logger()
@@ -43,15 +43,16 @@ class DtTrainedModel(ApiModel):
         print("[INFO] pre-processing image...")
         img_arr, img_width, img_height, scale_factor = ImageUtil.process_input_image(input_image, size)
 
-        print("[INFO] making prediction...")
-        self._dt_config = Utilities.update_config(self._dt_config, threshold, top_k)
+        print("[INFO] making predictions...")
+        self._dt_config.update_threshold(threshold)
+        self._dt_config.update_top_k(top_k)
         if self._predictor is None:
-            self._predictor = DefaultPredictor(self._dt_config)
+            self._predictor = DefaultPredictor(self._dt_config.cfg)
         predictions = self.output(img_arr)
 
         print("[INFO] making annotations...")
         vis_image = Visualizer(img_arr[:, :, ::-1], MetadataCatalog.get(
-            self._dt_config.DATASETS.TRAIN[0]), scale=1.2)
+            self._dt_config.cfg.DATASETS.TRAIN[0]), scale=1.2)
         vis_image = vis_image.draw_instance_predictions(predictions["instances"].to("cpu"))
         return vis_image.get_image()
 
@@ -65,8 +66,7 @@ class DtFreezeModel(DtTrainedModel):
     def __enter__(self):
         print("[INFO] loading pre-trained model...")
         super(DtFreezeModel, self).__enter__()
-        # self._dt_config, self._predictor = Utilities.load_predictor(self._model_config.model)
-        self._dt_config = Utilities.load_config(self._model_config.model)
+        self._dt_config = DtConfig(self._model_config.model)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
