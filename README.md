@@ -3,7 +3,6 @@
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 ![Build Docker Image](https://github.com/haruiz/FalconCV/workflows/Build%20Docker%20Image/badge.svg)
 ![TensorFlow Requirement: 1.15](https://img.shields.io/badge/TensorFlow%20Requirement-1.15-brightgreen)
-![TensorFlow 2 Not Supported](https://img.shields.io/badge/TensorFlow%202%20Not%20Supported-%E2%9C%95-red.svg)
 
 [![GitHub forks](https://img.shields.io/github/forks/haruiz/FalconCV.svg?style=social&label=Fork&maxAge=2592000)](https://GitHub.com/haruiz/FalconCV/network/)
 [![GitHub stars](https://img.shields.io/github/stars/haruiz/FalconCV.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/haruiz/FalconCV/stargazers/)
