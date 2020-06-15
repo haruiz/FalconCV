@@ -1,15 +1,10 @@
-name: Docker Image CI
-
+name: Build Docker Image
 on:
   push:
     branches: [ master ]
-
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout api
       uses: actions/checkout@v2
