@@ -4,9 +4,9 @@
 ![Build Docker Image](https://github.com/haruiz/FalconCV/workflows/Build%20Docker%20Image/badge.svg)
 ![TensorFlow Requirement: 1.15](https://img.shields.io/badge/TensorFlow%20Requirement-1.15-brightgreen)
 
-[![GitHub forks](https://img.shields.io/github/forks/haruiz/FalconCV.svg?style=social&label=Fork&maxAge=2592000)](https://GitHub.com/haruiz/FalconCV/network/)
-[![GitHub stars](https://img.shields.io/github/stars/haruiz/FalconCV.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/haruiz/FalconCV/stargazers/)
-[![GitHub watchers](https://img.shields.io/github/watchers/haruiz/FalconCV.svg?style=social&label=Watch&maxAge=2592000)](https://GitHub.com/haruiz/FalconCV/watchers/)
+[![GitHub forks](https://img.shields.io/github/forks/haruiz/FalconCV.svg?style=social&label=Fork&maxAge=86400)](https://GitHub.com/haruiz/FalconCV/network/)
+[![GitHub stars](https://img.shields.io/github/stars/haruiz/FalconCV.svg?style=social&label=Star&maxAge=86400)](https://GitHub.com/haruiz/FalconCV/stargazers/)
+[![GitHub watchers](https://img.shields.io/github/watchers/haruiz/FalconCV.svg?style=social&label=Watch&maxAge=86400)](https://GitHub.com/haruiz/FalconCV/watchers/)
 
 # FalconCV
 
