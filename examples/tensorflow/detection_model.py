@@ -1,5 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 from falconcv.models.tf import ModelZoo
 from falconcv.ds import OpenImages
 from falconcv.util import FileUtil, VIUtil
@@ -28,7 +29,7 @@ def create_dataset(images_folder, labels_map, n, batch_size):
         print("error creating the dataset {} ".format(ex))
 
 
-def train_model(model_name, images_folder, out_folder, labels_map, epochs=5000):
+def train_model(model_name, images_folder, out_folder, labels_map, epochs=2000):
     try:
         config = {
             "model": model_name,
@@ -67,11 +68,12 @@ if __name__ == '__main__':
     ModelZoo.print_available_models(arch="faster")
 
     # train model
-    train_model("faster_rcnn_inception_v2_coco", images_folder, model_folder, labels_map)
+    model = "faster_rcnn_inception_v2_coco"
+    train_model(model, images_folder, model_folder, labels_map)
 
     # inference
-    frozen_model_file = os.path.join(model_folder, "export/frozen_inference_graph.pb")
-    labels_map_file = os.path.join(model_folder, "label_map.pbtxt")
+    frozen_model_file = os.path.join(model_folder, model, "export/frozen_inference_graph.pb")
+    labels_map_file = os.path.join(model_folder, model, "label_map.pbtxt")
     from glob import glob
     for image in glob("../../examples/images/*"):
         make_predictions(frozen_model_file, labels_map_file, image)
