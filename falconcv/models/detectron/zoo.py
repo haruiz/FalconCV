@@ -56,7 +56,7 @@ class ModelZoo:
 
             return models
         except Exception as ex:
-            logger.error("Error listing the models : {}".format(ex))
+            logger.error(f"[ERROR] Error listing the models: {ex}")
 
     @classmethod
     def get_model_info(cls, model: str) -> ModelInfo:
@@ -65,7 +65,8 @@ class ModelZoo:
 
         model_info = [model_info for model_info in cls._models if model_info.name == model]
         if model_info is None:
-            raise ValueError('Model not found in Detectron2 model zoo')
+            logger.error(f"[ERROR] Model '{model}' not found in Detectron2 model zoo")
+            raise ValueError(f"Model '{model}' not found in Detectron2 model zoo")
 
         return next(iter(model_info), None)
 
