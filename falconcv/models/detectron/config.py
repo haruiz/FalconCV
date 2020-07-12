@@ -28,3 +28,16 @@ class DtConfig(object):
 
     def update_top_k(self, top_k: int):
         self._cfg.TEST.DETECTIONS_PER_IMAGE = top_k
+
+    def update_for_train(self, epochs: int, lr: float, bs: int, train_ds_name: str, test_ds_name: str,
+                         num_classes: int, output_folder: str):
+        self._cfg.SOLVER.MAX_ITER = epochs
+        self._cfg.DATASETS.TRAIN = (train_ds_name,)
+        if test_ds_name is not None:
+            self._cfg.DATASETS.TEST = (test_ds_name,)
+        self._cfg.DATALOADER.NUM_WORKERS = 0
+        self._cfg.SOLVER.IMS_PER_BATCH = 1
+        self._cfg.SOLVER.BASE_LR = lr
+        self._cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = bs
+        self._cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_classes
+        self._cfg.OUTPUT_DIR = output_folder

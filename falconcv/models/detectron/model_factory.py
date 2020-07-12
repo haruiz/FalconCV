@@ -1,11 +1,11 @@
-import os
-
-from falconcv.models.detectron.trained import DtFreezeModel
+from .trained import DtFreezeModel
+from .trainable import DtTrainableModel
 
 
 class APIModelFactory:
     @staticmethod
     def create(model=None, config=None):
         if config is None:
-            if not os.path.isfile(model):
-                return DtFreezeModel(model)
+            return DtFreezeModel(model)
+        else:
+            return DtTrainableModel(config)
