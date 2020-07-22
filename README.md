@@ -46,7 +46,6 @@ conda install -c conda-forge matplotlib
 conda install -c conda-forge lxml
 conda install -c conda-forge colorlog
 conda install -c conda-forge bs4
-conda install -c conda-forge pycocotools
 conda install -c conda-forge more-itertools
 conda install -c conda-forge mako
 conda install -c conda-forge wxpython
@@ -58,13 +57,13 @@ conda install scikit-learn
 
 ```bash
 sudo apt install protobuf-compiler
-pip install pycocotools
+conda install -c conda-forge pycocotools
 ```
 
 **Windows:**
 
 ```bash
-pip install pycocotools-win
+conda install -c conda-forge pycocotools
 ```
 
 3 - Install backends:
