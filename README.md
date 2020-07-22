@@ -64,8 +64,6 @@ pip install pycocotools
 **Windows:**
 
 ```bash
-pip install wmi
-pip install windows-curses
 pip install pycocotools-win
 ```
 
