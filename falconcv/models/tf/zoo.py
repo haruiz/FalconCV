@@ -5,7 +5,7 @@ import markdown
 import requests
 from bs4 import BeautifulSoup
 from falconcv.util import FileUtil, LibUtil
-from pick import pick
+#from pick import pick
 import logging
 
 from ...decor import typeassert
@@ -14,15 +14,15 @@ logger=logging.getLogger(__name__)
 
 
 class ModelZoo:
-    @classmethod
-    def pick_od_model(cls):
-        # pip install windows-curses
-        return pick(list(cls.available_models().keys()),"pick the model")[0]
-
-    @classmethod
-    def pick_od_pipeline(cls):
-        # pip install windows-curses
-        return pick(list(cls.available_pipelines().keys()),"pick the pipeline")[0]
+    # @classmethod
+    # def pick_od_model(cls):
+    #     # pip install windows-curses
+    #     return pick(list(cls.available_models().keys()),"pick the model")[0]
+    #
+    # @classmethod
+    # def pick_od_pipeline(cls):
+    #     # pip install windows-curses
+    #     return pick(list(cls.available_pipelines().keys()),"pick the pipeline")[0]
 
     @staticmethod
     def available_models(arch=None) -> []:

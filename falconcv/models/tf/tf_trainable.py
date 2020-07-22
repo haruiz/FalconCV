@@ -67,7 +67,7 @@ class TfTrainableModel(ApiModel):
         labels_map = config.get("labels_map", None)
         if labels_map:
             if isinstance(labels_map, dict):
-                self._labels_map = labels_map
+                self._labels_map = {k.title(): v for k,v in labels_map.items()}
             elif isinstance(labels_map, str) and os.path.isfile(labels_map):
                 self._labels_map = get_label_map_dict(labels_map)
             else:
@@ -191,15 +191,20 @@ class TfTrainableModel(ApiModel):
     def _mk_record_file(cls, images: dict, out_file, labels_map):
         delayed_tasks = [dask.delayed(img.to_example_record)(labels_map) for img in images]
         examples = dask.compute(*delayed_tasks)
+        assert examples, "annotations not found"
         with tf.io.TFRecordWriter(str(out_file)) as writer:
             for tf_example in examples:
                 if tf_example:
                     writer.write(tf_example.SerializeToString())
 
     def _mk_records(self, split_size):
-        train_images, val_images = self._dataset.split(split_size)
-        self._mk_record_file(train_images, self._train_record_file, self._labels_map)
-        self._mk_record_file(val_images, self._val_record_file, self._labels_map)
+        try:
+            train_images, val_images = self._dataset.split(split_size)
+            self._mk_record_file(train_images, self._train_record_file, self._labels_map)
+            self._mk_record_file(val_images, self._val_record_file, self._labels_map)
+        except Exception as ex:
+            raise Exception(f"was not possible to generate the tf records due : {ex}")
+
 
     def _load_dataset(self):
         img_files = FileUtil.get_files(self._images_folder, [".jpg", ".jpeg"])
@@ -270,6 +275,7 @@ class TfTrainableModel(ApiModel):
             # load dataset
             self._load_dataset()
             self._set_config_paths()
+
             return self
         except Exception as ex:
             raise Exception("Error loading the model : {}".format(ex)) from ex
@@ -280,9 +286,8 @@ class TfTrainableModel(ApiModel):
             raise exc_val
 
     @tf.contrib.framework.deprecated(None, 'Use object_detection/model_main.py.')
-    def train(self, epochs=100, val_split=0.3, clear_folder=False, override_pipeline=False, eval=False):
+    def train(self, epochs=100, val_split=0.3, clear_folder=False, eval=False):
         try:
-
             if clear_folder:
                 FileUtil.clear_folder(self._out_folder)
             self.num_steps = epochs
