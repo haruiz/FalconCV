@@ -1,7 +1,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from falconcv.models.tf import ModelZoo
-from falconcv.ds import Coco
+from falconcv.data import Coco
 from falconcv.util import FileUtil, VIUtil, ColorUtil
 from falconcv.models import ModelBuilder
 

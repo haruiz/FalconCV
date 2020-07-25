@@ -1,17 +1,15 @@
 import logging
 import math
-import os
 
 import boto3
 import dask
 import dask.dataframe as dd
 import more_itertools
 import numpy as np
-import cv2
 from dask.diagnostics import ProgressBar
 
-from falconcv.ds.dataset import DatasetDownloader
-from falconcv.ds.image import TaggedImage,BoxRegion,PolygonRegion
+from falconcv.data.ds.remote_dataset import DatasetDownloader
+from falconcv.data.ds.image import TaggedImage,BoxRegion
 from falconcv.util import S3Util
 
 logger=logging.getLogger(__name__)

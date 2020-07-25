@@ -83,7 +83,7 @@ class ModelZoo:
     def download_model(cls, model_name: str) -> str:
         available_models = cls.available_models()  # get the lis
         assert model_name in available_models, "Invalid model name {}".format(model_name)
-        checkpoint_model_path = LibUtil.models_home(subfolder="tf").joinpath(model_name)
+        checkpoint_model_path = LibUtil.models_home(sub_folder="tf").joinpath(model_name)
         model_uri = available_models[model_name]
         if not checkpoint_model_path.exists():
             FileUtil.download_file(model_uri, checkpoint_model_path, unzip=True, show_progress=True)

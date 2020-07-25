@@ -1,18 +1,17 @@
-import configparser
-import glob
 import logging
+import os
 import shutil
 import tarfile
+import typing
 import zipfile
+from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import urlparse
+
 import requests
-import typing
 import validators
-from clint.textui import progress
-import os
-from contextlib import contextmanager
 from tqdm import tqdm
+
 from falconcv.decor import pathassert
 
 logger = logging.getLogger(__name__)
@@ -41,7 +40,8 @@ class FileUtil:
         return False
 
     @classmethod
-    def download_file(cls, file_uri: str, out_folder: typing.Union[str, Path] = None, force=False, unzip=True, show_progress=False):
+    def download_file(cls, file_uri: str, out_folder: typing.Union[str, Path] = None, force=False, unzip=True,
+                      show_progress=False):
         try:
             assert cls.internet_on(), "Not internet connection"
             assert validators.url(file_uri), "invalid file uri parameter"
@@ -76,8 +76,8 @@ class FileUtil:
 
                 logger.debug("[INFO]: File ({}) download done".format(file_uri))
             if unzip and out_file.suffix in [".gz", ".zip"]:
-                #unzip_out_folder_name = remote_file_name[:remote_file_name.find('.')]
-                #unzip_out_folder = out_folder.joinpath(unzip_out_folder_name)
+                # unzip_out_folder_name = remote_file_name[:remote_file_name.find('.')]
+                # unzip_out_folder = out_folder.joinpath(unzip_out_folder_name)
                 cls.unzip_file(out_file, out_folder)
             return out_file
         except Exception as ex:
@@ -145,5 +145,3 @@ class FileUtil:
                 zf.extractall(output_folder)
         else:
             raise IOError("Extension {} not supported yet".format(ext))
-
-

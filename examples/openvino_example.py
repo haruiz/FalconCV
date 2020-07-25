@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from imutils.video import FPS, FileVideoStream
 
-from falconcv.ds import OpenImages
+from falconcv.data import OpenImages
 from falconcv.models import ModelBuilder
 from falconcv.util import FileUtil
 

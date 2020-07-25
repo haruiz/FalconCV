@@ -99,7 +99,7 @@ pip install git+https://github.com/haruiz/FalconCV.git
 ### OpenImages example
 
 ```python
-from falconcv.ds import OpenImages
+from falconcv.data import OpenImages
 
 if __name__ == '__main__':
     # Create the dataset
