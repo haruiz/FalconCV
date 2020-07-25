@@ -1,21 +1,21 @@
 import logging
 import math
 import random
-from pathlib import Path
 
 import dask
 from pycocotools.coco import COCO
 
-from falconcv.data import TaggedImage, BoxRegion, PolygonRegion
-from falconcv.data.ds.remote_dataset import RemoteDataset
-from falconcv.util import FileUtil, ImageUtil, ColorUtil
+from falconcv.util import FileUtil, ImageUtil
+from .image import TaggedImage, BoxRegion, PolygonRegion
+from .remote_dataset import RemoteDataset
 
 logger = logging.getLogger(__name__)
 
 
 class Coco(RemoteDataset):
 
-    def __init__(self, version: int = 2017,task="detection", split: str = "train", labels: [str] = None, n_images: int = 0,
+    def __init__(self, version: int = 2017, task="detection", split: str = "train", labels: [str] = None,
+                 n_images: int = 0,
                  batch_size: int = 12):
         """
         Create an instance of the coco dataset
@@ -24,34 +24,42 @@ class Coco(RemoteDataset):
         :param count: number of images by label
         :param batch_size: number of images by batch
         """
+        assert version == 2017, "version not supported"
+        assert task in ["detection", "segmentation"], "task not supported"
+        assert split in ["train", "validation"], "invalid split parameter"
         super(Coco, self).__init__(version, split, labels, n_images, batch_size)
         self._task = task
         self._files = {
             "annotations_file_uri": "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
         }
+        self.__load__()
 
     def __load__(self):
         """
-        Download tha image dependencies and load the coco api
+        Download dataset dependencies
         """
-        self._download_dependencies()
-        ann_folder = self.home().joinpath("annotations")
-        ann_file_prefix = "train" if self._split == "train" else "val"
-        ann_file = ann_folder.joinpath(f"instances_{ann_file_prefix}{self._version}.json")
-        self._coco_api_client = COCO(str(ann_file))
-        cat_ids = self._coco_api_client.getCatIds()
-        cats_info = self._coco_api_client.loadCats(cat_ids)
-        self._available_labels = {cat['id']: cat['name'].capitalize() for cat in cats_info}
-        # capitalize labels
-        labels = list(map(lambda l: str(l).capitalize(), self._labels))
-        valid_labels = {id: name for id, name in self._available_labels.items() if name.capitalize() in labels}
-        for class_id, class_name  in valid_labels.items():
-            images_ids = self._coco_api_client.getImgIds(catIds=class_id)
-            # grab the n images available
-            if self._n_images:
-                count = min(self._n_images, len(images_ids))
-                sample_images = random.sample(images_ids, count)
-                self._images += zip(sample_images, [class_id] * len(sample_images))
+        try:
+            self._download_dependencies()
+            ann_folder = self.home().joinpath("annotations")
+            ann_file_prefix = "train" if self._split == "train" else "val"
+            ann_file = ann_folder.joinpath(f"instances_{ann_file_prefix}{self._version}.json")
+            self._coco_api_client = COCO(str(ann_file))
+            cat_ids = self._coco_api_client.getCatIds()
+            cats_info = self._coco_api_client.loadCats(cat_ids)
+            self._available_labels = {cat['id']: cat['name'].capitalize() for cat in cats_info}
+            # capitalize labels
+            labels = list(map(lambda l: str(l).capitalize(), self._labels))
+            valid_labels = {id: name for id, name in self._available_labels.items() if name.capitalize() in labels}
+            for class_id, class_name in valid_labels.items():
+                images_ids = self._coco_api_client.getImgIds(catIds=class_id)
+                # grab the n images available
+                if self._n_images:
+                    count = min(self._n_images, len(images_ids))
+                    sample_images = random.sample(images_ids, count)
+                    self._images += zip(sample_images, [class_id] * len(sample_images))
+        except Exception as ex:
+            logger.error("Error loading the dataset : {} ".format(ex))
+            raise ex
 
     def __getitem__(self, item):
         return super(Coco, self).__getitem__(item)
@@ -83,8 +91,8 @@ class Coco(RemoteDataset):
                     all_x, all_y = [], []
                     for i in range(0, len(polygon), 2):
                         try:
-                            a, b = polygon[i], polygon[i+1]
-                            if all(map(lambda pt: isinstance(pt, float), [a,b])):
+                            a, b = polygon[i], polygon[i + 1]
+                            if all(map(lambda pt: isinstance(pt, float), [a, b])):
                                 all_x.append(math.ceil(polygon[i]))
                                 all_y.append(math.ceil(polygon[i + 1]))
                         except:
@@ -122,9 +130,9 @@ class Coco(RemoteDataset):
                 tagged_image = TaggedImage(img_arr)
                 tagged_image.id = img_id
                 if self._task == "detection":
-                    tagged_image.regions = self._create_box_rois(annotations_info,class_name)
+                    tagged_image.regions = self._create_box_rois(annotations_info, class_name)
                 elif self._task == "segmentation":
-                    tagged_image.regions = self._create_polygon_rois(annotations_info,class_name)
+                    tagged_image.regions = self._create_polygon_rois(annotations_info, class_name)
                 return tagged_image
         except Exception as ex:
             logger.error("error downloading the image with id {} : {}".format(img_info["id"], ex))
@@ -144,32 +152,6 @@ class Coco(RemoteDataset):
                     )
                 )
             )
-        return dask.compute(*delayed_tasks)  # download the images in parallel using dask
-
-
-if __name__ == '__main__':
-    labels_map = {
-        "bird": 1,
-        "cat": 2,
-        "zebra": 3,
-        "horse": 4
-    }
-    color_palette = ColorUtil.color_palette(n=len(labels_map))
-
-    ds = Coco(
-        version=2017,
-        split="train",
-        task="segmentation",
-        labels=labels_map.keys(),
-        n_images=4,
-        batch_size=1
-    )
-    print(ds.home())
-    print(next(ds))
-    data_folder = Path("./data")
-    data_folder.mkdir(exist_ok=True)
-    FileUtil.clear_folder(data_folder)
-    # # Download images
-    for batch_images in ds:
-        for image in batch_images:
-            image.export(data_folder, labels_map, color_palette) # copy images to disk
+        results = dask.compute(*delayed_tasks)
+        results = [img for img in results if img]
+        return results  # download the images in parallel using dask

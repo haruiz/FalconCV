@@ -17,7 +17,6 @@ class Dataset(metaclass=ABCMeta):
         self._batches = None  # list of batches
         self._deps = {}
         self._files = {}
-        self.__load__()
 
     @property
     def images(self) -> []:

@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 class RemoteDataset(Dataset):
     @abstractmethod
     def __init__(self, version: int = 2017, split: str = "train", labels: [str] = None, n_images: int = 0, batch_size: int = 12):
+        super().__init__(batch_size)
         self._split = split
         self._version = version
         self._n_images = n_images
         self._labels = labels
         self._available_labels = {}
-        super().__init__(batch_size)
 
     @property
     def available_labels(self):
@@ -32,10 +32,10 @@ class RemoteDataset(Dataset):
 
     def _download_dependencies(self):
         """Download the dataset dependencies"""
-        logger.info("Downloading {} dataset dependencies, it can take a few minutes".format(type(self).__name__))
+        print("Downloading {} dataset dependencies, it can take a few minutes".format(type(self).__name__))
         for dep_name, dep_uri in self._files.items():
             self._deps[dep_name] = FileUtil.download_file(dep_uri, self.home(), show_progress=True, unzip=True)
-        logger.info("Download dependencies done")
+        print("Download dependencies done")
 
     def _get_dependency(self, name):
         """
