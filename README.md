@@ -138,8 +138,7 @@ if __name__ == '__main__':
     config = {
         "model": "<model name from zoo>",
         "images_folder": "<images folder path>",
-        "output_folder": "<model output folder>",
-        "labels_map": "<labels map as a dict or file>",
+        "output_folder": "<model output folder>"
     }
     with ModelBuilder.build(config=config) as model:
         model.train(epochs=2000,val_split=0.3,clear_folder=False)
