@@ -99,25 +99,33 @@ pip install git+https://github.com/haruiz/FalconCV.git
 ### OpenImages example
 
 ```python
-from falconcv.data import OpenImages
+from falconcv.data.ds import OpenImages
+from falconcv.util import FileUtil
+from pathlib import Path
 
 if __name__ == '__main__':
     # Create the dataset
-    dataset = OpenImages(v=6) # versions 5 and 6 supported
-    dataset.setup(split="train", task="detection")
-    images_folder = "<output folder>"
-    for batch_images in dataset.fetch(
-        n=100, # number of images by class
-        labels=["Mouse", "dog"], # target labels
-        batch_size=50 # batch images size
-        ):
-        # Do something cool with the images
-        for img in batch_images:
-            # export images to disk
-            img.export(images_folder)
-            for region in img.regions:
-                print(region.shape_attributes["x"],
-                      region.shape_attributes["y"])
+    ds = OpenImages(
+        version=6, # versions 5 and 6 supported
+        split="train",
+        task="detection",
+        labels=["cat", "Dog"],# target labels
+        n_images=4,# number of images by class
+        batch_size=2 # batch images size
+    )
+    # print dataset home
+    print(ds.home())
+    # get next batch 
+    print(next(ds))     
+    print(len(ds))
+    print(ds.batches_count)
+    data_folder = Path("./data")
+    data_folder.mkdir(exist_ok=True)
+    FileUtil.clear_folder(data_folder)
+    # Download images
+    for batch_images in ds:
+        for image in batch_images:
+            image.export(data_folder)  # copy images to disk
 ```
 
 ## Models
