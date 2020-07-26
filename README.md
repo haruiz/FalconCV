@@ -112,11 +112,9 @@ if __name__ == '__main__':
         labels=["cat", "Dog"],# target labels
         n_images=4,# number of images by class
         batch_size=2 # batch images size
-    )
-    # print dataset home
-    print(ds.home())
-    # get next batch 
-    print(next(ds))     
+    )    
+    print(ds.home()) # print dataset home    
+    print(next(ds)) # get next batch     
     print(len(ds))    
     data_folder = Path("./data")
     data_folder.mkdir(exist_ok=True)
