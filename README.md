@@ -117,8 +117,7 @@ if __name__ == '__main__':
     print(ds.home())
     # get next batch 
     print(next(ds))     
-    print(len(ds))
-    print(ds.batches_count)
+    print(len(ds))    
     data_folder = Path("./data")
     data_folder.mkdir(exist_ok=True)
     FileUtil.clear_folder(data_folder)
