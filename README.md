@@ -30,45 +30,38 @@ conda create --name falconcv python=3.6
 2 - Install dependencies:
 
 ```bash
-pip install matplotlib
-pip install numpy==1.17
-pip install opencv-contrib-python
-pip install pillow
-pip install cython
-pip install tqdm
-pip install scipy
-pip install requests
-pip install clint
-pip install validators
-pip install more-itertools
-pip install pandas
-pip install imutils
-pip install boto3
-pip install "dask[complete]"
-pip install lxml
-pip install Mako
-pip install colorlog
-pip install colorama
-pip install bs4
-pip install pick
-pip install -U scikit-learn
-pip install gitpython
-conda install -c anaconda wxpython
+conda install -c conda-forge opencv
+conda install -c conda-forge requests
+conda install -c conda-forge clint
+conda install -c conda-forge git
+conda install -c conda-forge gitpython
+conda install -c conda-forge validators
+conda install -c conda-forge colorama
+conda install -c conda-forge tqdm
+conda install -c conda-forge boto3
+conda install -c conda-forge pillow
+conda install -c conda-forge dask
+conda install -c conda-forge matplotlib
+conda install -c conda-forge lxml
+conda install -c conda-forge colorlog
+conda install -c conda-forge bs4
+conda install -c conda-forge more-itertools
+conda install -c conda-forge mako
+conda install -c conda-forge wxpython
+conda install scikit-learn
 ```
 
 **Linux:**
 
 ```bash
 sudo apt install protobuf-compiler
-pip install pycocotools
+conda install -c conda-forge pycocotools
 ```
 
 **Windows:**
 
 ```bash
-pip install wmi
-pip install windows-curses
-pip install pycocotools-win
+conda install -c conda-forge pycocotools
 ```
 
 3 - Install backends:

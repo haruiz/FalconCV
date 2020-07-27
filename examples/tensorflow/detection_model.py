@@ -48,8 +48,8 @@ def make_predictions(frozen_model, labels_map_file, image):
     # load freeze model
     with ModelBuilder.build(frozen_model, labels_map_file) as model:
         img, predictions = model.predict(image, threshold=0.5)
-        import matplotlib
-        matplotlib.use('WXAgg')
+        #import matplotlib
+        #matplotlib.use('WXAgg')
         VIUtil.imshow(img, predictions)
 
 

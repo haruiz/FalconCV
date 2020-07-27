@@ -34,7 +34,7 @@ logger.setLevel(logging.DEBUG)
 name = "falconcv"
 __version__ = "1.0.22"
 os.environ[
-    "TF_OBJECT_DETECTION_MODEL_ZOO_URI"] = r"https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md"
+    "TF_OBJECT_DETECTION_MODEL_ZOO_URI"]=r"https://github.com/haruiz/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md"
 os.environ[
     "TF_OBJECT_DETECTION_MODEL_CONFIG_URI"] = r"https://api.github.com/repos/tensorflow/models/contents/research/object_detection/samples/configs"
 
