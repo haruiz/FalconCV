@@ -31,7 +31,6 @@ conda create --name falconcv python=3.6
 
 ```bash
 conda install -c conda-forge opencv
-conda install tensorflow-gpu==1.15.0
 conda install -c conda-forge requests
 conda install -c conda-forge clint
 conda install -c conda-forge git
@@ -49,7 +48,6 @@ conda install -c conda-forge bs4
 conda install -c conda-forge more-itertools
 conda install -c conda-forge mako
 conda install -c conda-forge wxpython
-conda install -c conda-forge matplotlib
 conda install scikit-learn
 ```
 
