@@ -19,15 +19,17 @@ Additionally, taking advantage of the fantastic features that OpenVINO offers, a
 # Supported frameworks
 
 - [Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection).
+- [Detectron2](https://github.com/facebookresearch/detectron2).
 
 # Installation
 
-1 - Create and activate a conda environment:
+## 1 - Create and activate a conda environment
 
 ```bash
 conda create --name falconcv python=3.6
 ```
-2 - Install dependencies:
+
+## 2 - Install dependencies
 
 ```bash
 conda install -c conda-forge opencv
@@ -64,10 +66,42 @@ conda install -c conda-forge pycocotools
 conda install -c conda-forge pycocotools
 ```
 
-3 - Install backends:
+## 3 - Install Backends
 
-- **TensorFlow:** `conda install tensorflow-gpu==1.15.0`
+### **TensorFlow:**
 
+```bash
+conda install tensorflow-gpu==1.15.0
+```
+
+**Note:** For more details installing TensorFlow go to the [official site](https://www.tensorflow.org/install).
+
+### **Detectron2**
+
+**PyTorch (PyTorch 1.5.1 + CUDA 10.1):**
+
+```bash
+conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
+```
+
+or
+
+```bash
+pip install torch==1.5.0+cu101 torchvision==0.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+```
+
+**Note:** For more details installing PyTorch go to the [official site](https://pytorch.org/).
+
+**Detectron2 (0.1.3):**
+
+```bash
+pip install detectron2==0.1.3 -f \
+  https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/torch1.5/index.html
+```
+
+**Note:** For more details installing Detectron2 go to the [official site](https://github.com/facebookresearch/detectron2/blob/master/INSTALL.md).
+
+## Install FalconCV
 
 ### Option 1: Install FalconCV from GitHub source
 
@@ -77,18 +111,17 @@ cd FalconCV
 python setup.py develop --user
 ```
 
-### Option 2: Install FalconCV from PyPi (test):
+### Option 2: Install FalconCV from PyPi (test)
 
 ```bash
 pip install -i https://test.pypi.org/simple/ falconcv
 ```
 
-### Option 3: Install FalconCV from github:
+### Option 3: Install FalconCV from GitHub
 
 ```bash
 pip install git+https://github.com/haruiz/FalconCV.git
 ```
-
 
 # Usage
 
@@ -159,6 +192,7 @@ Fork the repository and run the steps from [Install FalconCV from GitHub source]
 Send a pull request!
 
 # Contributors
+
 <a href="https://github.com/haruiz/FalconCV/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=haruiz/FalconCV" />
 </a>
@@ -174,8 +208,11 @@ Send a pull request!
     year   = "2020--"
 }
 ```
+
 # Credits
+
 - [Speed/accuracy trade-offs for modern convolutional object detectors.](https://arxiv.org/abs/1611.10012)
 
 # License
+
 Free software: [MIT license](LICENSE)
