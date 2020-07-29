@@ -49,6 +49,7 @@ conda install -c conda-forge more-itertools
 conda install -c conda-forge mako
 conda install -c conda-forge wxpython
 conda install scikit-learn
+conda install -c conda-forge pycairo
 ```
 
 **Linux:**
