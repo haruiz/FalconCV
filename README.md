@@ -148,7 +148,7 @@ if __name__ == '__main__':
         model.train(epochs=2000,val_split=0.3,clear_folder=False)
 ```
 
-** Inference using a trained model**
+**Inference using a trained model**
 
 ```python
 from falconcv.models import ModelBuilder
