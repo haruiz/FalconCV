@@ -50,6 +50,7 @@ conda install -c conda-forge mako
 conda install -c conda-forge wxpython
 conda install -c conda-forge matplotlib
 conda install scikit-learn
+conda install -c conda-forge pycairo
 ```
 
 **Linux:**
