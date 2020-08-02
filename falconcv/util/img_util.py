@@ -1,10 +1,11 @@
 import os
-import validators
-import numpy as np
 import urllib.request
-import cv2
 from urllib.error import HTTPError
-from PIL import Image, ImageFile
+
+import cv2
+import numpy as np
+import validators
+from PIL import Image
 
 
 class ImageUtil:

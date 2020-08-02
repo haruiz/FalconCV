@@ -1,10 +1,10 @@
 from io import BytesIO
+
 import boto3
 import numpy as np
 from PIL import Image
 from botocore import UNSIGNED, exceptions
 from botocore.config import Config
-import cv2
 
 
 class S3Util:

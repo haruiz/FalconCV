@@ -31,7 +31,6 @@ conda create --name falconcv python=3.6
 
 ```bash
 conda install -c conda-forge opencv
-conda install tensorflow-gpu==1.15.0
 conda install -c conda-forge requests
 conda install -c conda-forge clint
 conda install -c conda-forge git
@@ -68,7 +67,11 @@ conda install -c conda-forge pycocotools
 
 3 - Install backends:
 
-- **TensorFlow:** `conda install tensorflow-gpu==1.15.0`
+- **TensorFlow:** 
+```bash
+conda install tensorflow-gpu==1.15.0
+conda install -c conda-forge tf-slim
+```
 
 
 ### Option 1: Install FalconCV from GitHub source

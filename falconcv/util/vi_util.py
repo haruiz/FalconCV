@@ -1,21 +1,18 @@
 import io
-import itertools
 import math
-import os
-import random
 from io import BytesIO
 from pathlib import Path
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
+from lxml import objectify
 # from .color_util import ColorUtil
 from matplotlib import patches
 
-from .misc_util import BoundingBox
-from .file_util import FileUtil
 from .color_util import ColorUtil
-from lxml import objectify
+from .misc_util import BoundingBox
 
 
 class VIUtil:

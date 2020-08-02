@@ -1,6 +1,3 @@
-import os
-
-
 class WinUtil:
     # wmi_conn = wmi.WMI() for local.
     @staticmethod
