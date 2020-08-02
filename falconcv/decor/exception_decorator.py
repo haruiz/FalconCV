@@ -5,11 +5,13 @@ import sys
 import traceback
 from functools import wraps
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 def get_class(f):
     return vars(sys.modules[f.__module__])[f.__qualname__.split('.')[0]]
-    #print(inspect.stack()[1].function)
+
 
 def exception(function):
     """
@@ -17,7 +19,7 @@ def exception(function):
     exceptions should one occur
     """
 
-    @wraps( function )
+    @wraps(function)
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
@@ -30,10 +32,11 @@ def exception(function):
             # re-raise the exception
             # raise
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            exc_message = traceback.format_exception_only( exc_type, exc_value )[0]
+            exc_message = traceback.format_exception_only(exc_type, exc_value)[0]
             cls = get_class(function)
             if cls:
-                logger.error(" Calling the function `{}.{}` -> {} ".format(cls.__name__,function.__name__, exc_message ) )
+                logger.error(
+                    " Calling the function `{}.{}` -> {} ".format(cls.__name__, function.__name__, exc_message))
             else:
                 logger.error(" Calling the function `{}` -> {} ".format(function.__name__, exc_message))
             raise

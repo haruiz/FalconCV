@@ -86,7 +86,7 @@ class TaggedImage:
         return super().__dir__()
 
     def export(self, out_folder: str, labels_map=None, color_palette= None):
-        out_folder = Path(out_folder) if isinstance(out_folder, str) else out_folder
+        out_folder = Path(out_folder)
         out_folder.mkdir(exist_ok=True)
         # create xml
         self.filename= "{}.jpeg".format(self.id)
@@ -110,7 +110,7 @@ class TaggedImage:
         image.save(str(out_folder.joinpath(self.filename))) # export image
         # export mask
         polygons = [r for r in self.regions if isinstance(r, PolygonRegion)]
-        if len(polygons) > 0:
+        if len(polygons) > 0 and color_palette:
             mask = Image.new("P", (width, height), 0)
             mask.putpalette(color_palette)
             for region in polygons:
@@ -135,3 +135,7 @@ class TaggedImage:
                             del drawable_image
             # res = cv2.bitwise_and(img,img,mask = mask)
             mask.save(str(out_folder.joinpath("{}.png".format(self.id))), "PNG")  # export image
+
+
+if __name__ == '__main__':
+    image = TaggedImage.from_file(r"/home/haruiz/models/animals/data/train/0b69ead831b7de5a.jpeg")

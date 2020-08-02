@@ -1,5 +1,5 @@
 import os
-from falconcv.ds import Coco
+from falconcv.data import Coco
 from falconcv.models import ModelBuilder
 from falconcv.util import FileUtil, ImageUtil, VIUtil, ColorUtil
 from falconcv.models.tf import ModelZoo
