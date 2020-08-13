@@ -9,6 +9,7 @@ def typeassert(*ty_args, **ty_kargs):
         # Map function argument names to supplied types
         sig = signature(func)
         bound_types = sig.bind_partial(*ty_args, **ty_kargs).arguments
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             bound_values = sig.bind(*args, **kwargs)
@@ -22,12 +23,17 @@ def typeassert(*ty_args, **ty_kargs):
                         type_checking = list(type_checking)
                         if not any(type_checking):
                             supported_types = list(map(str, attr_type))
-                            raise TypeError('Error calling the function {}, argument {} must be {} '.format(func.__name__, name," or ".join(supported_types)))
+                            raise TypeError(
+                                'Error calling the function {}, argument {} must be {} '.format(func.__name__, name,
+                                                                                                " or ".join(
+                                                                                                    supported_types)))
                     else:
                         if not isinstance(value, attr_type):
-                            raise TypeError('Error calling the function {}, argument {} must be {}'.format(func.__name__, name, attr_type))
+                            raise TypeError(
+                                'Error calling the function {}, argument {} must be {}'.format(func.__name__, name,
+                                                                                               attr_type))
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorate
-
-

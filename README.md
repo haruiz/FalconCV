@@ -131,25 +131,30 @@ pip install git+https://github.com/haruiz/FalconCV.git
 ### OpenImages example
 
 ```python
-from falconcv.ds import OpenImages
+from falconcv.data.ds import OpenImages
+from falconcv.util import FileUtil
+from pathlib import Path
 
 if __name__ == '__main__':
     # Create the dataset
-    dataset = OpenImages(v=6) # versions 5 and 6 supported
-    dataset.setup(split="train", task="detection")
-    images_folder = "<output folder>"
-    for batch_images in dataset.fetch(
-        n=100, # number of images by class
-        labels=["Mouse", "dog"], # target labels
-        batch_size=50 # batch images size
-        ):
-        # Do something cool with the images
-        for img in batch_images:
-            # export images to disk
-            img.export(images_folder)
-            for region in img.regions:
-                print(region.shape_attributes["x"],
-                      region.shape_attributes["y"])
+    ds = OpenImages(
+        version=6, # versions 5 and 6 supported
+        split="train",
+        task="detection",
+        labels=["cat", "Dog"],# target labels
+        n_images=4,# number of images by class
+        batch_size=2 # batch images size
+    )
+    print(ds.home()) # print dataset home
+    print(next(ds)) # get next batch
+    print(len(ds))    
+    data_folder = Path("./data")
+    data_folder.mkdir(exist_ok=True)
+    FileUtil.clear_folder(data_folder)
+    # Download images
+    for batch_images in ds:
+        for image in batch_images:
+            image.export(data_folder)  # copy images to disk
 ```
 
 ## Models
@@ -165,11 +170,23 @@ if __name__ == '__main__':
     config = {
         "model": "<model name from zoo>",
         "images_folder": "<images folder path>",
-        "output_folder": "<model output folder>",
-        "labels_map": "<labels map as a dict or file>",
+        "output_folder": "<model output folder>"
     }
     with ModelBuilder.build(config=config) as model:
         model.train(epochs=2000,val_split=0.3,clear_folder=False)
+```
+
+**Inference using a trained model:**
+
+```python
+from falconcv.models import ModelBuilder
+from falconcv.util import VIUtil
+if __name__ == '__main__':
+    with ModelBuilder.build("<Frozen model path>.pb", "<labels map file>.pbx") as model:
+        image_file = "<image file>.jpg"
+        img, predictions = model(image_file, threshold=0.5)
+        fig = VIUtil.imshow(img, predictions)
+        fig.savefig('demo.png', bbox_inches='tight')
 ```
 
 For more detailed info visit the [documentation](https://haruiz.github.io/FalconCV/).

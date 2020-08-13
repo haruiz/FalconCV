@@ -1,21 +1,14 @@
 import os
-import validators
-import numpy as np
 import urllib.request
-import cv2
 from urllib.error import HTTPError
+
+import cv2
+import numpy as np
+import validators
+from PIL import Image
 
 
 class ImageUtil:
-    @staticmethod
-    def process_input_image(input_image, size=None):
-        img_arr, scale_factor = ImageUtil.read(input_image), 1  # read image
-        if size:
-            img_arr, scale_factor = ImageUtil.resize(img_arr, width=size[0], height=[1])  # resize image
-        img_height, img_width = img_arr.shape[:2]
-
-        return img_arr, img_width, img_height, scale_factor
-
     @staticmethod
     def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
         # initialize the dimensions of the image to be resized and
@@ -65,6 +58,7 @@ class ImageUtil:
         if isinstance(image, str):
             if os.path.isfile(image):
                 image_arr = cv2.imread(image, cv2.IMREAD_COLOR)
+                image_arr = cv2.cvtColor(image_arr, cv2.COLOR_BGR2RGB)
             elif validators.url(image):
                 image_arr = cls.url2img(image)
             else:
@@ -73,3 +67,48 @@ class ImageUtil:
         elif isinstance(image, np.ndarray):
             image_arr = image
         return image_arr
+
+    @staticmethod
+    def get_concat_h(im1, im2):
+        dst = Image.new('RGB', (im1.width + im2.width, im1.height))
+        dst.paste(im1, (0, 0))
+        dst.paste(im2, (im1.width, 0))
+        return dst
+
+    @staticmethod
+    def get_concat_v(im1, im2):
+        dst = Image.new('RGB', (im1.width, im1.height + im2.height))
+        dst.paste(im1, (0, 0))
+        dst.paste(im2, (0, im1.height))
+        return dst
+
+    @staticmethod
+    def get_concat_h_multi_resize(im_list, resample=Image.BICUBIC):
+        min_height = min(im.height for im in im_list)
+        im_list_resize = [im.resize((int(im.width * min_height / im.height), min_height), resample=resample)
+                          for im in im_list]
+        total_width = sum(im.width for im in im_list_resize)
+        dst = Image.new('RGB', (total_width, min_height))
+        pos_x = 0
+        for im in im_list_resize:
+            dst.paste(im, (pos_x, 0))
+            pos_x += im.width
+        return dst
+
+    @staticmethod
+    def get_concat_v_multi_resize(im_list, resample=Image.BICUBIC):
+        min_width = min(im.width for im in im_list)
+        im_list_resize = [im.resize((min_width, int(im.height * min_width / im.width)), resample=resample)
+                          for im in im_list]
+        total_height = sum(im.height for im in im_list_resize)
+        dst = Image.new('RGB', (min_width, total_height))
+        pos_y = 0
+        for im in im_list_resize:
+            dst.paste(im, (0, pos_y))
+            pos_y += im.height
+        return dst
+
+    @classmethod
+    def get_concat_tile_resize(cls, im_list_2d, resample=Image.BICUBIC):
+        im_list_v = [cls.get_concat_h_multi_resize(im_list_h, resample=resample) for im_list_h in im_list_2d]
+        return cls.get_concat_v_multi_resize(im_list_v, resample=resample)
