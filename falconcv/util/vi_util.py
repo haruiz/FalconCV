@@ -124,7 +124,7 @@ class VIUtil:
         return the annotations of the image
         :param image_path: image path
         :return: a list with the bounding boxes
-        """
+        '''
         try:
             image_path = Path(image_path)
             file_name = image_path.stem
