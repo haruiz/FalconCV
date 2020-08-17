@@ -91,12 +91,14 @@ class OpenImages(RemoteDataset):
                 image_rois
             ))
             delayed_tasks.append(download_task)
-        results = dask.compute(*delayed_tasks)
+        with ProgressBar():
+            results = dask.compute(*delayed_tasks)
         results = [img for img in results if img]
         return results
 
     def _fetch_single_image(self, image_id, parts):
         try:
+
             bucket = "open-images-dataset"
             key = "{}/{}.jpg".format(self._split, image_id)
             arr = S3Util.fetch_image_unsigned(bucket, key)
@@ -134,7 +136,6 @@ class OpenImages(RemoteDataset):
 
     def __load__(self):
         try:
-            print(self._files)
             self._download_dependencies()
             class_descriptions_csv = self._get_dependency("class_names_object_detection")
             classes_segmentation_txt = self._get_dependency("class_names_segmentation")

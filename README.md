@@ -30,25 +30,25 @@ conda create --name falconcv python=3.6
 2 - Install dependencies:
 
 ```bash
-conda install -c conda-forge opencv
-conda install -c conda-forge requests
-conda install -c conda-forge clint
-conda install -c conda-forge git
-conda install -c conda-forge gitpython
-conda install -c conda-forge validators
-conda install -c conda-forge colorama
-conda install -c conda-forge tqdm
-conda install -c conda-forge boto3
-conda install -c conda-forge pillow
-conda install -c conda-forge dask
-conda install -c conda-forge matplotlib
-conda install -c conda-forge lxml
-conda install -c conda-forge colorlog
-conda install -c conda-forge bs4
-conda install -c conda-forge more-itertools
-conda install -c conda-forge mako
-conda install -c conda-forge wxpython
-conda install scikit-learn
+conda install -c conda-forge opencv  -y
+conda install -c conda-forge requests -y
+conda install -c conda-forge clint -y
+conda install -c conda-forge git -y
+conda install -c conda-forge gitpython -y
+conda install -c conda-forge validators -y
+conda install -c conda-forge colorama -y
+conda install -c conda-forge tqdm -y
+conda install -c conda-forge boto3 -y
+conda install -c conda-forge pillow -y
+conda install -c conda-forge dask -y
+conda install -c conda-forge matplotlib -y
+conda install -c conda-forge lxml -y
+conda install -c conda-forge colorlog -y
+conda install -c conda-forge bs4 -y
+conda install -c conda-forge more-itertools -y
+conda install -c conda-forge mako -y
+conda install -c conda-forge wxpython -y
+conda install scikit-learn -y
 conda install -c conda-forge pycairo
 ```
 
@@ -62,15 +62,15 @@ conda install -c conda-forge pycocotools
 **Windows:**
 
 ```bash
-conda install -c conda-forge pycocotools
+pip install pycocotools-win
 ```
 
 3 - Install backends:
 
 - **TensorFlow:** 
 ```bash
-conda install tensorflow-gpu==1.15.0
-conda install -c conda-forge tf-slim
+conda install tensorflow-gpu==1.15.0 -y
+conda install -c conda-forge tf-slim -y
 ```
 
 
