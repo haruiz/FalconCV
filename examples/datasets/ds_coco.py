@@ -28,11 +28,7 @@ def create_detection_dataset(images_folder, target_labels, n_images, batch_size,
 
 if __name__ == '__main__':
     # images_folder = "<your images folder path>"
-    train_images_folder = "/mnt/D/Dev/falconcv/datasets/coco/animals/train"
-    val_images_folder = "/mnt/D/Dev/falconcv/datasets/coco/animals/val"
+    images_folder = "/mnt/D/Dev/falconcv/datasets/coco/animals"
     target_labels = ["bird", "eagle", "falcon"]
     # create detection the dataset for train
-    create_detection_dataset(train_images_folder, target_labels, n_images=500, batch_size=250, split="train")
-
-    # create detection the dataset for validation
-    # create_detection_dataset(val_images_folder, target_labels, n_images=100, batch_size=100, split="validation")
+    create_detection_dataset(images_folder, target_labels, n_images=500, batch_size=50, split="train")

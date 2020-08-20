@@ -32,25 +32,25 @@ conda create --name falconcv python=3.6
 ## 2 - Install dependencies
 
 ```bash
-conda install -c conda-forge opencv
-conda install -c conda-forge requests
-conda install -c conda-forge clint
-conda install -c conda-forge git
-conda install -c conda-forge gitpython
-conda install -c conda-forge validators
-conda install -c conda-forge colorama
-conda install -c conda-forge tqdm
-conda install -c conda-forge boto3
-conda install -c conda-forge pillow
-conda install -c conda-forge dask
-conda install -c conda-forge matplotlib
-conda install -c conda-forge lxml
-conda install -c conda-forge colorlog
-conda install -c conda-forge bs4
-conda install -c conda-forge more-itertools
-conda install -c conda-forge mako
-conda install -c conda-forge wxpython
-conda install scikit-learn
+conda install -c conda-forge opencv -y
+conda install -c conda-forge requests -y
+conda install -c conda-forge clint -y
+conda install -c conda-forge git -y
+conda install -c conda-forge gitpython -y
+conda install -c conda-forge validators -y
+conda install -c conda-forge colorama -y
+conda install -c conda-forge tqdm -y
+conda install -c conda-forge boto3 -y
+conda install -c conda-forge pillow -y
+conda install -c conda-forge dask -y
+conda install -c conda-forge matplotlib -y
+conda install -c conda-forge lxml -y
+conda install -c conda-forge colorlog -y
+conda install -c conda-forge bs4 -y
+conda install -c conda-forge more-itertools -y
+conda install -c conda-forge mako -y
+conda install -c conda-forge wxpython -y
+conda install scikit-learn -y
 conda install -c conda-forge pycairo
 ```
 
@@ -64,7 +64,7 @@ conda install -c conda-forge pycocotools
 **Windows:**
 
 ```bash
-conda install -c conda-forge pycocotools
+pip install pycocotools-win
 ```
 
 ## 3 - Install Backends
@@ -72,12 +72,13 @@ conda install -c conda-forge pycocotools
 ### **TensorFlow:**
 
 ```bash
-conda install tensorflow-gpu==1.15.0
+conda install tensorflow-gpu==1.15.0 -y
+conda install -c conda-forge tf-slim -y
 ```
 
 **Note:** For more details installing TensorFlow go to the [official site](https://www.tensorflow.org/install).
 
-### **Detectron2**
+### **Detectron2:**
 
 **PyTorch (PyTorch 1.5.1 + CUDA 10.1):**
 
@@ -102,9 +103,9 @@ pip install detectron2==0.1.3 -f \
 
 **Note:** For more details installing Detectron2 go to the [official site](https://github.com/facebookresearch/detectron2/blob/master/INSTALL.md).
 
-## Install FalconCV
+## 4 - Install FalconCV
 
-### Option 1: Install FalconCV from GitHub source
+### **Option 1: Install FalconCV from GitHub source**
 
 ```bash
 git clone https://github.com/haruiz/FalconCV
@@ -112,13 +113,13 @@ cd FalconCV
 python setup.py develop --user
 ```
 
-### Option 2: Install FalconCV from PyPi (test)
+### **Option 2: Install FalconCV from PyPi (test)**
 
 ```bash
 pip install -i https://test.pypi.org/simple/ falconcv
 ```
 
-### Option 3: Install FalconCV from GitHub
+### **Option 3: Install FalconCV from GitHub**
 
 ```bash
 pip install git+https://github.com/haruiz/FalconCV.git
@@ -147,7 +148,7 @@ if __name__ == '__main__':
     )
     print(ds.home()) # print dataset home
     print(next(ds)) # get next batch
-    print(len(ds))    
+    print(len(ds))
     data_folder = Path("./data")
     data_folder.mkdir(exist_ok=True)
     FileUtil.clear_folder(data_folder)
@@ -183,8 +184,7 @@ from falconcv.models import ModelBuilder
 from falconcv.util import VIUtil
 if __name__ == '__main__':
     with ModelBuilder.build("<Frozen model path>.pb", "<labels map file>.pbx") as model:
-        image_file = "<image file>.jpg"
-        img, predictions = model(image_file, threshold=0.5)
+        img, predictions = model("<image file|uri>", threshold=0.5)
         fig = VIUtil.imshow(img, predictions)
         fig.savefig('demo.png', bbox_inches='tight')
 ```
