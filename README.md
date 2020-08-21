@@ -49,7 +49,6 @@ conda install -c conda-forge more-itertools -y
 conda install -c conda-forge mako -y
 conda install -c conda-forge wxpython -y
 conda install scikit-learn -y
-conda install -c conda-forge pycairo
 ```
 
 **Linux:**
@@ -200,3 +199,14 @@ Send a pull request!
 
 # License
 Free software: [MIT license](LICENSE)
+
+
+# Common problems
+1. After installing all the dependencies I still getting the error: `No module named 'tf_slim'.
+ 
+**How to solve it?**
+
+Install `tf_slim` using the command below:
+
+`pip install git+https://github.com/google-research/tf-slim.git`
+  
