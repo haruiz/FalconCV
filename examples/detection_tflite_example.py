@@ -54,14 +54,14 @@ def make_predictions(frozen_model,labels_map_file, image):
         VIUtil.imshow(img,predictions)
 
 
-def convert2tflite(model_name, images_folder, epochs=2000):
+def convert2tflite(model_name, images_folder, checkpoint=2000):
     try:
         config = {
             "model": model_name,
             "images_folder": images_folder
         }
         with ModelBuilder.build(config=config) as model:
-            model.to_tflite(checkpoint=epochs)
+            model.to_tflite(checkpoint=checkpoint)
     except Exception as ex:
         raise Exception("Error training the model {} ".format(ex)) from ex
 
