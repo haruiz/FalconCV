@@ -54,18 +54,30 @@ def make_predictions(frozen_model,labels_map_file, image):
         VIUtil.imshow(img,predictions)
 
 
+def convert2tflite(model_name, images_folder, epochs=2000):
+    try:
+        config = {
+            "model": model_name,
+            "images_folder": images_folder
+        }
+        with ModelBuilder.build(config=config) as model:
+            model.to_tflite(checkpoint=epochs)
+    except Exception as ex:
+        raise Exception("Error training the model {} ".format(ex)) from ex
+
+
 if __name__ == '__main__':
     images_folder = "./data"
     model_folder = "./mymodel"
 
-    model_name = "faster_rcnn_resnet50_coco"
+    model_name = "ssd_mobilenet_v1_coco"
     target_labels = ["bird", "eagle"]
 
     # create dataset
     # create_detection_dataset(images_folder,target_labels, n_images=500, batch_size=100)
 
     # picking and training the model
-    print(ModelZoo.available_models())  # check the models available
+    print(ModelZoo.available_models(arch="ssd"))  # check the models available
     train_model(model_name, images_folder, model_folder, epochs=1000)
 
     # doing inference

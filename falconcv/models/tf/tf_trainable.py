@@ -403,7 +403,8 @@ class TfTrainableModel(ApiModel):
                 self.input_size[0], self.input_size[1]
             )
             cmd = " ".join([line.strip() for line in cmd.splitlines()])
-            print(subprocess.check_output(cmd, shell=True).decode())
+            subprocess.check_output(cmd, shell=True)
+            # print(subprocess.check_output(cmd, shell=True).decode())
             return self
         except Exception as ex:
             raise Exception("Error converting the model {}".format(ex)) from ex

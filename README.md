@@ -154,8 +154,7 @@ from falconcv.util import VIUtil
 if __name__ == '__main__':
     with ModelBuilder.build("<Frozen model path>.pb", "<labels map file>.pbx") as model:        
         img, predictions = model("<image file|uri>", threshold=0.5)
-        fig = VIUtil.imshow(img, predictions)
-        fig.savefig('demo.png', bbox_inches='tight')
+        VIUtil.imshow(img, predictions)        
 ```
 
 For more detailed info visit the [documentation](https://haruiz.github.io/FalconCV/).
