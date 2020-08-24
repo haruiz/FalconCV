@@ -93,7 +93,7 @@ class OpenImages(RemoteDataset):
             delayed_tasks.append(download_task)
         with ProgressBar():
             results = dask.compute(*delayed_tasks)
-        results = [img for img in results if img]
+        results = [img for img in results if isinstance(img, TaggedImage)]
         return results
 
     def _fetch_single_image(self, image_id, parts):

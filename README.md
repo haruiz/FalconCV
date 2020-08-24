@@ -51,7 +51,6 @@ conda install -c conda-forge more-itertools -y
 conda install -c conda-forge mako -y
 conda install -c conda-forge wxpython -y
 conda install scikit-learn -y
-conda install -c conda-forge pycairo
 ```
 
 **Linux:**
@@ -185,8 +184,7 @@ from falconcv.util import VIUtil
 if __name__ == '__main__':
     with ModelBuilder.build("<Frozen model path>.pb", "<labels map file>.pbx") as model:
         img, predictions = model("<image file|uri>", threshold=0.5)
-        fig = VIUtil.imshow(img, predictions)
-        fig.savefig('demo.png', bbox_inches='tight')
+        VIUtil.imshow(img, predictions)
 ```
 
 For more detailed info visit the [documentation](https://haruiz.github.io/FalconCV/).
@@ -205,6 +203,7 @@ You can see the detailed [roadmap](https://github.com/haruiz/FalconCV/projects/1
 # How to contribute
 
 We are encouraging anyone around the world to contribute to this project. So, we principally need help improving the documentation, translation to other languages (which includes but not limited to French, Spanish, Portuguese, Arabian, and more) or adding new features.
+
 Fork the repository and run the steps from [Install FalconCV from GitHub source](#option-1-install-falconcv-from-github-source). Any questions, do not hesitate to write an email to henryruiz22@gmail.com. We are excited to see where this project goes.
 
 Send a pull request!
@@ -234,3 +233,14 @@ Send a pull request!
 # License
 
 Free software: [MIT license](LICENSE)
+
+# Common Issues
+
+## After installing all the dependencies I still getting the error: `No module named 'tf_slim'
+
+**How to solve it?**
+
+Install `tf_slim` using the command below:
+
+`pip install git+https://github.com/google-research/tf-slim.git`
+  

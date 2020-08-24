@@ -53,6 +53,7 @@ class TFObjectDetectionAPI(ApiInstaller):
             output = p.stdout.readlines()
             error = p.stderr.readlines()
             if error:
+                print(error)
                 raise IOError(error)
             if output:
                 logger.debug(output)

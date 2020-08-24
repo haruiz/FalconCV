@@ -4,6 +4,8 @@ import random
 
 import dask
 from pycocotools.coco import COCO
+from dask.diagnostics import ProgressBar
+from tqdm import tqdm
 
 from falconcv.util import FileUtil, ImageUtil
 from .image import TaggedImage, BoxRegion, PolygonRegion
@@ -142,6 +144,12 @@ class Coco(RemoteDataset):
         images_ids = [img_id for img_id, _ in batch]
         categories_ids = [category_id for _, category_id in batch]
         images_details = self._coco_api_client.loadImgs(ids=images_ids)
+        # results = []
+        # for img_info, category_id in tqdm(zip(images_details, categories_ids)):
+        #     img = self._fetch_image(img_info, category_id)
+        #     if img:
+        #         results.append(img)
+        # return results
         delayed_tasks = []
         for img_info, category_id in zip(images_details, categories_ids):
             delayed_tasks.append(
@@ -152,6 +160,7 @@ class Coco(RemoteDataset):
                     )
                 )
             )
-        results = dask.compute(*delayed_tasks)
-        results = [img for img in results if img]
+        with ProgressBar():
+            results = dask.compute(*delayed_tasks)
+        results = [img for img in results if isinstance(img, TaggedImage)]
         return results  # download the images in parallel using dask
