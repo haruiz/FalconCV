@@ -20,9 +20,10 @@ def train_model(model_name, train_images_folder, test_images_folder, out_folder,
 
 
 if __name__ == '__main__':
-    train_images_folder = "/mnt/D/Dev/falconcv/datasets/openimages/animals/train"
-    test_images_folder = "/mnt/D/Dev/falconcv/datasets/openimages/animals/test"
-    model_folder = "/mnt/D/Dev/falconcv/models/detectron/animals"
+    train_images_folder = "<your images folder path>"
+    test_images_folder = "<your images folder path>"
+    model_folder = "<your model folder path>"
+
     labels_map = {
         "Bird": 1,
         "Eagle": 2,
@@ -34,4 +35,5 @@ if __name__ == '__main__':
 
     # train model
     model = "R101"
-    train_model(model, train_images_folder, test_images_folder, model_folder, labels_map, epochs=500, batch_size=32)
+    train_model(model, train_images_folder, test_images_folder, model_folder, labels_map, epochs=5000,
+                learning_rate=0.00005, batch_size=32)

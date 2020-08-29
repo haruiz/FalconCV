@@ -95,7 +95,7 @@ class DtTrainableModel(ApiModel):
         self._train_ds_name = "ds_train"
 
         # reading test images folder
-        if "test_images_folder" in config:
+        if "test_images_folder" in config and not "test_images_folder":
             self._test_images_folder = Path(config["test_images_folder"])
             assert self._test_images_folder.exists(), "test images folder not found"
 
@@ -114,8 +114,6 @@ class DtTrainableModel(ApiModel):
         if labels_map:
             if isinstance(labels_map, dict):
                 self._labels_map = labels_map
-            # elif isinstance(labels_map, str) and os.path.isfile(labels_map):
-            #     self._labels_map = get_label_map_dict(labels_map)
             else:
                 raise Exception("`labels map` parameter must be a dictionary or a file")
 

@@ -33,6 +33,7 @@ class DtConfig(object):
                          num_classes: int, output_folder: str):
         self._cfg.SOLVER.MAX_ITER = epochs
         self._cfg.DATASETS.TRAIN = (train_ds_name,)
+        self._cfg.DATASETS.TEST = ()
         if test_ds_name is not None:
             self._cfg.DATASETS.TEST = (test_ds_name,)
         self._cfg.DATALOADER.NUM_WORKERS = 0

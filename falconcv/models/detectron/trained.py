@@ -35,8 +35,8 @@ class DtTrainedModel(ApiModel):
     def output(self, input_image: np.ndarray):
         raise NotImplementedError()
 
-    @typeassert(input_image=[str, np.ndarray], size=tuple)
-    def predict(self, input_image, size=None, threshold=0.5, top_k=10):
+    @typeassert(input_image=[str, np.ndarray], size=tuple, threshold=float, top_k=int)
+    def __call__(self, input_image, size=None, threshold=0.5, top_k=10):
         logger.info("[INFO] Pre-processing image...")
         img_arr, img_width, img_height, scale_factor = ImageUtil.process_input_image(input_image, size)
 

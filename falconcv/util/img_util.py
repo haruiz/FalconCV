@@ -112,3 +112,11 @@ class ImageUtil:
     def get_concat_tile_resize(cls, im_list_2d, resample=Image.BICUBIC):
         im_list_v = [cls.get_concat_h_multi_resize(im_list_h, resample=resample) for im_list_h in im_list_2d]
         return cls.get_concat_v_multi_resize(im_list_v, resample=resample)
+
+    @staticmethod
+    def process_input_image(input_image, size=None):
+        img_arr, scale_factor = ImageUtil.read(input_image), 1  # read image
+        if size:
+            img_arr, scale_factor = ImageUtil.resize(img_arr, width=size[0], height=[1])  # resize image
+        img_height, img_width = img_arr.shape[:2]
+        return img_arr, img_width, img_height, scale_factor

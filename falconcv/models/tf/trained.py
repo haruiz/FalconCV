@@ -35,6 +35,13 @@ class TfTrainedModel(ApiModel):
         if exc_type:
             logger.error("Error loading the model:  {}, {}".format(exc_type, str(exc_val)))
 
+    @staticmethod
+    def _process_input_image(input_image, size=None):
+        img_arr, scale_factor = ImageUtil.read(input_image), 1  # read image
+        if size: img_arr, scale_factor = ImageUtil.resize(img_arr, width=size[0], height=[1])  # resize image
+        img_height, img_width = img_arr.shape[:2]
+        return img_arr, img_width, img_height, scale_factor
+
     @abc.abstractmethod
     @typeassert(input_image=np.ndarray)
     def output_dict(self, input_image: np.ndarray):

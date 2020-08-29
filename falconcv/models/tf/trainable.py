@@ -4,10 +4,11 @@ import logging
 import os
 import subprocess
 from pathlib import Path
-import dask
-import typing
+
 import tensorflow as tf
 
+tf_logger = tf.get_logger()
+tf_logger.propagate = False
 from object_detection import model_hparams, model_lib, export_tflite_ssd_graph_lib, exporter
 from object_detection.builders import graph_rewriter_builder, dataset_builder, model_builder
 from object_detection.legacy import trainer
@@ -21,10 +22,12 @@ from falconcv.models.api_model import ApiModel
 from falconcv.util import FileUtil
 from .zoo import ModelZoo
 from .util import Utilities
+
+import dask
+import typing
+
 from .pascal_voc_ds import PascalVOCImage, PascalVOCDataset
 
-tf_logger = tf.get_logger()
-tf_logger.propagate = False
 logger = logging.getLogger(__name__)
 
 
