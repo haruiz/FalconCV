@@ -182,7 +182,7 @@ if __name__ == '__main__':
 from falconcv.models import ModelBuilder
 from falconcv.util import VIUtil
 if __name__ == '__main__':
-    with ModelBuilder.build("<Frozen model path>.pb", "<labels map file>.pbx") as model:
+    with ModelBuilder.build("<Frozen model path>.pb", "<labels map file>.pbtxt") as model:
         img, predictions = model("<image file|uri>", threshold=0.5)
         VIUtil.imshow(img, predictions)
 ```

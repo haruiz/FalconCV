@@ -1,6 +1,7 @@
+from pathlib import Path
+
 from falconcv.data.ds import Coco
 from falconcv.util import FileUtil
-from pathlib import Path
 
 
 def create_detection_dataset(images_folder, target_labels, n_images, batch_size, split):
@@ -19,7 +20,8 @@ def create_detection_dataset(images_folder, target_labels, n_images, batch_size,
         data_folder.mkdir(exist_ok=True)
         FileUtil.clear_folder(data_folder)
         # Download images
-        for batch_images in dataset:
+        for i, batch_images in enumerate(dataset):
+            print(f"[INFO] Download done for batch {i + 1} of {dataset.batches_count}")
             for image in batch_images:
                 image.export(data_folder)  # copy images to disk
     except Exception as ex:
