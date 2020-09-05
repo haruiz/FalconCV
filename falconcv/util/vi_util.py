@@ -249,3 +249,12 @@ class VIUtil:
         # #plt.tight_layout()
         # plt.show()
         # return fig
+
+    @classmethod
+    def img_show(cls, img):
+        fig = plt.figure(figsize=(20, 10))
+        ax = fig.add_subplot(111, aspect='equal')
+        ax.imshow(img)
+        plt.show()
+
+        return fig

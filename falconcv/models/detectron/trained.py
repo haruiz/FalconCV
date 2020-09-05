@@ -4,12 +4,11 @@ import abc
 
 from detectron2.engine import DefaultPredictor
 from detectron2.utils.logger import setup_logger
-from detectron2.data import MetadataCatalog
-from detectron2.utils.visualizer import Visualizer
 
 from falconcv.models import ApiModel
 from falconcv.decor import typeassert
 from falconcv.util.img_util import ImageUtil
+from falconcv.util import BoundingBox
 from .config import DtConfig
 
 logger = logging.getLogger(__name__)
@@ -45,13 +44,31 @@ class DtTrainedModel(ApiModel):
         self._dt_config.update_top_k(top_k)
         if self._predictor is None:
             self._predictor = DefaultPredictor(self._dt_config.cfg)
-        predictions = self.output(img_arr)
+        output_dict = self.output(img_arr)
 
-        logger.info("[INFO] Making annotations...")
-        vis_image = Visualizer(img_arr[:, :, ::-1], MetadataCatalog.get(
-            self._dt_config.cfg.DATASETS.TRAIN[0]), scale=1.2)
-        vis_image = vis_image.draw_instance_predictions(predictions["instances"].to("cpu"))
-        return vis_image.get_image()
+        logger.info("[INFO] Building annotations...")
+        output_dict = output_dict["instances"].to("cpu")
+        boxes = output_dict.pred_boxes.tensor.numpy() if output_dict.has("pred_boxes") else None
+        scores = output_dict.scores.numpy() if output_dict.has("scores") else None
+        classes = output_dict.pred_classes.numpy().astype(np.int64) if output_dict.has("pred_classes") else None
+        num_detections = len(output_dict)
+        masks = [None for _ in range(num_detections)]
+        predictions = []
+
+        for box, mask, score, label in zip(boxes, masks, scores, classes):
+            label = self._dt_config.get_class_label(label)
+            start_x, start_y, end_x, end_y = box
+            predictions.append(BoundingBox(
+                start_x,
+                start_y,
+                end_x,
+                end_y,
+                label,
+                round(float(score), 2),
+                scale_factor,
+                mask
+            ))
+        return img_arr, predictions
 
 
 class DtFreezeModel(DtTrainedModel):
