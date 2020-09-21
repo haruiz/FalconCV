@@ -234,8 +234,9 @@ class TfTrainableModel(ApiModel):
         if self._labels_map is None:
             labels = set()
             for img in self._dataset:
-                for bounding_box in img.annotations["object"]:
-                    labels.add(bounding_box["name"].strip().title())
+                if img.annotations:
+                    for bounding_box in img.annotations["object"]:
+                        labels.add(bounding_box["name"].strip().title())
             self._labels_map = {l: i + 1 for i, l in enumerate(labels)}
         # update number of classes
         getattr(self.pipeline.model, self.arch).num_classes = len(self._labels_map)

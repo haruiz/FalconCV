@@ -26,11 +26,15 @@ class PascalVOCImage:
         self.annotations = {}
 
     def load(self):
-        if self.xml_path.exists():
-            with tf.io.gfile.GFile(str(self.xml_path), 'r') as fid:
-                xml_str = fid.read()
-            xml = etree.fromstring(xml_str)
-            self.annotations = dataset_util.recursive_parse_xml_to_dict(xml)['annotation']
+        try:
+            if self.xml_path.exists():
+                with tf.io.gfile.GFile(str(self.xml_path), 'r') as fid:
+                    xml_str = fid.read()
+                xml = etree.fromstring(xml_str)
+                self.annotations = dataset_util.recursive_parse_xml_to_dict(xml)['annotation']
+        except Exception as ex:
+            print(f"Error reading the file {ex}: {self.xml_path}")
+        
 
     def to_example_record(self, labels_map):
         # read image
@@ -70,6 +74,7 @@ class PascalVOCImage:
         encoded_mask_png_list = []
         if self.annotations:
             if 'object' in self.annotations:
+                
                 for obj in self.annotations['object']:
                     class_name = obj['name'].strip().title()
                     class_id = labels_map[class_name]
@@ -151,6 +156,5 @@ class PascalVOCDataset:
 
     def split(self, split_size=float):
         return train_test_split(self._images, test_size=split_size, random_state=42, shuffle=True)
-
 
 
