@@ -1,3 +1,4 @@
+import os
 import numpy as np
 
 from detectron2 import model_zoo
@@ -8,23 +9,31 @@ from falconcv.models.detectron import ModelZoo
 
 
 class DtConfig(object):
-    def __init__(self, model: str):
+    def __init__(self, model: str, config: str = None):
         self._cfg = None
         self._train_class_names = None
-        self._load(model)
+        self._load(model, config)
 
     @property
     def cfg(self):
         return self._cfg
 
-    def _load(self, model: str):
-        # get model info
-        model_info = ModelZoo.get_model_info(model)
-        # create configuration file
+    def _load(self, model: str, config: str = None):
         self._cfg = get_cfg()
-        self._cfg.merge_from_file(model_zoo.get_config_file(model_info.get_config_path()))
-        self._cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_info.get_config_path())
-        self._train_class_names = MetadataCatalog.get(self._cfg.DATASETS.TRAIN[0]).get("thing_classes", None)
+
+        if os.path.isfile(model):
+            # get model info
+            model_info = ModelZoo.get_model_info(config)
+            # create configuration file
+            self._cfg.merge_from_file(model_zoo.get_config_file(model_info.get_config_path()))
+            self._cfg.MODEL.WEIGHTS = model
+        else:
+            # get model info
+            model_info = ModelZoo.get_model_info(model)
+            # create configuration file
+            self._cfg.merge_from_file(model_zoo.get_config_file(model_info.get_config_path()))
+            self._cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_info.get_config_path())
+            self._train_class_names = MetadataCatalog.get(self._cfg.DATASETS.TRAIN[0]).get("thing_classes", None)
 
     def update_threshold(self, threshold: float):
         self._cfg.MODEL.RETINANET.SCORE_THRESH_TEST = threshold
@@ -48,6 +57,12 @@ class DtConfig(object):
         self._cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = bs
         self._cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_classes
         self._cfg.OUTPUT_DIR = output_folder
+
+    def update_for_inference(self, ds_name: str, num_classes: int):
+        self._cfg.DATASETS.TRAIN = ()
+        self._cfg.DATASETS.TEST = (ds_name,)
+        self._train_class_names = MetadataCatalog.get(ds_name).get("thing_classes", None)
+        self._cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_classes
 
     def get_class_label(self, class_index: np.int64):
         if self._train_class_names is None:

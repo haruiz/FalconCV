@@ -1,6 +1,7 @@
 import numpy as np
 import logging
 import abc
+from pathlib import Path
 
 from detectron2.engine import DefaultPredictor
 from detectron2.utils.logger import setup_logger
@@ -10,6 +11,7 @@ from falconcv.decor import typeassert
 from falconcv.util.img_util import ImageUtil
 from falconcv.util import BoundingBox
 from .config import DtConfig
+from .pascal_voc_ds import DtPascalVOCDataset
 
 logger = logging.getLogger(__name__)
 setup_logger()
@@ -86,8 +88,86 @@ class DtFreezeModel(DtTrainedModel):
     def __exit__(self, exc_type, exc_val, exc_tb):
         super(DtFreezeModel, self).__exit__(exc_type, exc_val, exc_tb)
 
-    def output(self, img_arr: np.ndarray):
+    def output(self, input_image: np.ndarray):
         if self._dt_config and self._predictor:
-            predictions = self._predictor(img_arr)
+            predictions = self._predictor(input_image)
+            return predictions
+        return None
+
+
+class DtSaveModel(DtTrainedModel):
+    @typeassert(model=str, config=dict)
+    def __init__(self, model: str, config: dict):
+        logger.info("[INFO] Detectron2 predictions...")
+        super(DtSaveModel, self).__init__(model)
+        self._config = config
+        # validate params
+        self._check_params(config)
+        # init props
+        self._model_path = None
+        self._model_zoo_config = None
+        self._dataset_folder = None
+        self._dataset_xml_folder = None
+        self._ds_name = None
+        self._labels_map = None
+        # unwrap config in props
+        self._unwrap_config(config)
+        # init props
+        self._classes_list = list(self._labels_map.keys())
+        self._num_classes = len(self._classes_list)
+        self._dataset = DtPascalVOCDataset(self._classes_list)
+        self._dt_config = None
+
+    def __enter__(self):
+        logger.info("[INFO] Loading model...")
+        try:
+            self._dataset.register(self._ds_name, self._dataset_folder, self._dataset_xml_folder, "test")
+            self._dt_config = DtConfig(self._model, self._model_zoo_config)
+            self._dt_config.update_for_inference(self._ds_name, self._num_classes)
+        except Exception as ex:
+            raise Exception(f"[ERROR] Error loading the model: {ex}") from ex
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        super(DtSaveModel, self).__exit__(exc_type, exc_val, exc_tb)
+
+    def _check_params(self, config: dict):
+        # check model
+        assert "model" in config and isinstance(config["model"], str), \
+            "`model` parameter is required and must be an string"
+
+        # check model zoo config
+        assert "model_zoo_config" in config and isinstance(config["model_zoo_config"], str), \
+            "`model zoo config` parameter is required and must be an string"
+
+        # check dataset folder
+        assert "dataset_folder" in config and isinstance(config["dataset_folder"], str), \
+            "`dataset folder` parameter is required and must be an string"
+
+        assert "labels_map" in config, "`labels map` parameter is required and must be a dictionary or a file"
+
+    def _unwrap_config(self, config: dict):
+        # reading model path
+        self._model_path = config["model"]
+        self._model_zoo_config = config["model_zoo_config"]
+
+        # reading dataset images folder
+        self._dataset_folder = Path(config["dataset_folder"])
+        assert self._dataset_folder.exists(), "dataset folder not found"
+
+        self._dataset_xml_folder = Path(config.get("dataset_xml_folder", self._dataset_folder))
+        self._ds_name = "ds_test"
+
+        # reading labels maps
+        labels_map = config.get("labels_map", None)
+        if labels_map:
+            if isinstance(labels_map, dict):
+                self._labels_map = labels_map
+            else:
+                raise Exception("`labels map` parameter must be a dictionary or a file")
+
+    def output(self, input_image: np.ndarray):
+        if self._dt_config and self._predictor:
+            predictions = self._predictor(input_image)
             return predictions
         return None

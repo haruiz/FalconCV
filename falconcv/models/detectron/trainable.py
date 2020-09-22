@@ -99,7 +99,7 @@ class DtTrainableModel(ApiModel):
             self._test_images_folder = Path(config["test_images_folder"])
             assert self._test_images_folder.exists(), "test images folder not found"
 
-            self._test_xml_folder = Path(config.get("test_images_folder", self._test_images_folder))
+            self._test_xml_folder = Path(config.get("test_xml_folder", self._test_images_folder))
             self._test_ds_name = "ds_test"
 
         # reading output folder
