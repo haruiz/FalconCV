@@ -3,7 +3,7 @@ import time
 import dask
 import more_itertools
 
-from falconcv.ds.scrapper import ImagesScrapper
+from falconcv.data.scraper.scraper import ImagesScraper
 from falconcv.util import FileUtil,ImageUtil
 from requests import exceptions
 from urllib3.exceptions import ProtocolError
@@ -16,9 +16,9 @@ BING_IMAGE_SEARCH_ENDPOINT="https://api.cognitive.microsoft.com/bing/v7.0/images
 EXCEPTIONS={ProtocolError,IOError,FileNotFoundError,exceptions.RequestException,exceptions.HTTPError,exceptions.ConnectionError, exceptions.Timeout}
 
 
-class BingScrapper(ImagesScrapper):
+class BingScraper(ImagesScraper):
     def __init__(self,subscription_key,endpoint=None):
-        super(BingScrapper,self).__init__()
+        super(BingScraper, self).__init__()
         self.subscription_key=subscription_key
         self.endpoint=endpoint if endpoint else BING_IMAGE_SEARCH_ENDPOINT
 

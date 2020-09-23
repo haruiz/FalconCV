@@ -34,6 +34,7 @@ class PascalVOCImage:
 
     def to_example_record(self, labels_map):
         # read image
+
         try:
             with tf.io.gfile.GFile(str(self.img_path), 'rb') as fid:
                 encoded_jpg = fid.read()

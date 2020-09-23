@@ -48,7 +48,7 @@ class TfTrainedModel(ApiModel):
         raise NotImplementedError()
 
     @typeassert(input_image=[str, np.ndarray], size=tuple, threshold=float, top_k=int)
-    def predict(self, input_image, size=None, threshold=0.5, top_k=10):
+    def __call__(self, input_image, size=None, threshold=0.5, top_k=10):
         img_arr, img_width, img_height, scale_factor = self._process_input_image(input_image, size)
         output_dict = self.output_dict(img_arr)
         boxes = output_dict["detection_boxes"]

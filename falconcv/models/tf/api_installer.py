@@ -16,7 +16,6 @@ class TFObjectDetectionAPI(ApiInstaller):
     def __init__(self):
         super(TFObjectDetectionAPI, self).__init__()
         self.repo_uri = "https://github.com/haruiz/models.git"
-        #"https://github.com/tensorflow/models.git"
         self._package_name = "object_detection"
 
 
@@ -54,6 +53,7 @@ class TFObjectDetectionAPI(ApiInstaller):
             output = p.stdout.readlines()
             error = p.stderr.readlines()
             if error:
+                print(error)
                 raise IOError(error)
             if output:
                 logger.debug(output)

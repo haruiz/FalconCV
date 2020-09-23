@@ -5,7 +5,7 @@ import markdown
 import requests
 from bs4 import BeautifulSoup
 from falconcv.util import FileUtil, LibUtil
-from pick import pick
+#from pick import pick
 import logging
 
 from ...decor import typeassert
@@ -14,15 +14,15 @@ logger=logging.getLogger(__name__)
 
 
 class ModelZoo:
-    @classmethod
-    def pick_od_model(cls):
-        # pip install windows-curses
-        return pick(list(cls.available_models().keys()),"pick the model")[0]
-
-    @classmethod
-    def pick_od_pipeline(cls):
-        # pip install windows-curses
-        return pick(list(cls.available_pipelines().keys()),"pick the pipeline")[0]
+    # @classmethod
+    # def pick_od_model(cls):
+    #     # pip install windows-curses
+    #     return pick(list(cls.available_models().keys()),"pick the model")[0]
+    #
+    # @classmethod
+    # def pick_od_pipeline(cls):
+    #     # pip install windows-curses
+    #     return pick(list(cls.available_pipelines().keys()),"pick the pipeline")[0]
 
     @staticmethod
     def available_models(arch=None) -> []:
@@ -83,7 +83,7 @@ class ModelZoo:
     def download_model(cls, model_name: str) -> str:
         available_models = cls.available_models()  # get the lis
         assert model_name in available_models, "Invalid model name {}".format(model_name)
-        checkpoint_model_path = LibUtil.models_home(subfolder="tf").joinpath(model_name)
+        checkpoint_model_path = LibUtil.models_home(sub_folder="tf").joinpath(model_name)
         model_uri = available_models[model_name]
         if not checkpoint_model_path.exists():
             FileUtil.download_file(model_uri, checkpoint_model_path, unzip=True, show_progress=True)

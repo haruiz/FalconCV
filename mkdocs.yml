@@ -8,6 +8,9 @@ nav:
     - Datasets: datasets.md
     - Models: models.md
 theme:
+  features:
+    - tabs
+    - instant
   name: 'material'
   logo: "images/logo.png"
   font:
@@ -17,12 +20,8 @@ extra:
   search:
     language: en
   social:
-    - type: github
+    - icon: fontawesome/brands/github-alt
       link: https://github.com/haruiz
-    - type: twitter
-      link: https://twitter.com/devharuiz
-    - type: linkedin
-      link: https://www.linkedin.com/in/haruiz/
 
 markdown_extensions:
   - footnotes

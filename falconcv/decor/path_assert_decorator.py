@@ -7,8 +7,8 @@ from pathlib import Path
 
 
 def pathassert(func):
-    # Map function argument names to supplied types
     sig = signature(func)
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         bounds = sig.bind(*args, **kwargs)
@@ -21,7 +21,5 @@ def pathassert(func):
                     raise TypeError(
                         'Argument `{}` must be a valid path'.format(arg_name))
         return func(*args, **kwargs)
+
     return wrapper
-
-
-
