@@ -8,38 +8,38 @@ ARG CUDA_TYPE=devel
 ARG LINUX_VERSION=ubuntu18.04
 ARG PYTHON_VERSION=3.6
 FROM ${FROM_IMAGE}:${CUDA_VERSION}-${CUDA_TYPE}-${LINUX_VERSION}
-
 # Define arguments
 ARG ENV_NAME=falconcv
-
 # Set environment
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/lib:/opt/conda/envs/${ENV_NAME}/lib
 ENV PATH=${PATH}:/conda/bin
-
 # Add a condarc for override settings
 COPY docker/.condarc /conda/.condarc
-
 RUN apt-get update -y \
     && apt-get upgrade -y \
     && apt-get install nano -y \
     && apt-get install protobuf-compiler -y
 
+
+RUN apt-get install ffmpeg libsm6 libxext6  -y
+
+RUN apt-get install -y python3 python3-pip
+RUN pip3 install matplotlib
+
 WORKDIR /${ENV_NAME}
-
 COPY . .
-
+#RUN conda config --add channels bioconda \
+#&& conda config --set channel_priority strict
 RUN source activate base \
-    && conda env create -f docker/environment.yml \
+    && conda env create -f docker/environment.yml --debug \
     && conda clean -afy \
     && sed -i 's/conda activate base/conda activate falconcv/g' ~/.bashrc \
     && chmod -R ugo+w /opt/conda \
     && source activate ${ENV_NAME} \
     && python setup.py install #Installs FalconCV on the env
-
 RUN mv docker/.run_in_falconcv.sh /.run_in_falconcv \
     && chmod u+x /.run_in_falconcv \
     && chmod u+x docker/start_jupyter.sh
-
 # Jupyter notebooks port
 EXPOSE 8888
 # Dask Scheduler Bokeh port

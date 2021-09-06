@@ -50,7 +50,7 @@ def train_model(model_name, images_folder,model_folder, epochs=500):
 def make_predictions(frozen_model,labels_map_file, image):
     # load freeze model
     with ModelBuilder.build(frozen_model,labels_map_file) as model:
-        img,predictions=model.predict(image, threshold=0.5)
+        img,predictions=model(image, threshold=0.5)
         VIUtil.imshow(img,predictions)
 
 

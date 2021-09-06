@@ -3,12 +3,12 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - nomkl
+  #- nomkl
   - cudatoolkit
-  - libgcc-ng
-  - libstdcxx-ng
+  #- libgcc-ng
+  #- libstdcxx-ng
   - wxpython
-  - python=3.6.9
+  - python=3.6
   - pip
   - jupyterlab
   - tensorflow-gpu=1.15.0

@@ -2,7 +2,11 @@ import tensorflow as tf
 import pkg_resources
 from object_detection.utils.config_util import create_pipeline_proto_from_configs, \
     save_pipeline_config
-
+import numpy as np
+import itertools
+from object_detection.inference import detection_inference
+tf.logging.set_verbosity(tf.logging.INFO)
+import pandas as pd
 
 class Utilities:
     @staticmethod
@@ -19,6 +23,74 @@ class Utilities:
                 graph_def.ParseFromString(f.read())
                 tf.compat.v1.import_graph_def(graph_def,name="")
         return graph,tf.compat.v1.Session(graph=graph)
+
+    @staticmethod
+    def generate_detections_record(input_tfrecord_paths, output_tfrecord_path, inference_graph):
+        with tf.Session() as sess:
+            input_tfrecord_paths = [
+                v for v in input_tfrecord_paths.split(',') if v]
+            tf.logging.info('Reading input from %d files', len(input_tfrecord_paths))
+            serialized_example_tensor, image_tensor = detection_inference.build_input(
+                input_tfrecord_paths)
+            tf.logging.info('Reading graph and building model...')
+            (detected_boxes_tensor, detected_scores_tensor,
+             detected_labels_tensor) = detection_inference.build_inference_graph(
+                image_tensor, inference_graph)
+
+            tf.logging.info('Running inference and writing output to {}'.format(
+                output_tfrecord_path))
+            sess.run(tf.local_variables_initializer())
+            tf.train.start_queue_runners()
+            with tf.python_io.TFRecordWriter(output_tfrecord_path) as tf_record_writer:
+                try:
+                    for counter in itertools.count():
+                        tf.logging.log_every_n(tf.logging.INFO, 'Processed %d images...', 10, counter)
+                        tf_example = detection_inference.infer_detections_and_add_to_example(
+                            serialized_example_tensor, detected_boxes_tensor,
+                            detected_scores_tensor, detected_labels_tensor,
+                            False)
+                        tf_record_writer.write(tf_example.SerializeToString())
+                except tf.errors.OutOfRangeError:
+                    tf.logging.info('Finished processing records')
+
+    @staticmethod
+    def confusion_matrix_to_dataframe(confusion_matrix, categories, iou_threshold):
+        print("\nConfusion Matrix:")
+        print(confusion_matrix, "\n")
+        results = []
+
+        for i in range(len(categories)):
+            id = categories[i]["id"] - 1
+            name = categories[i]["name"]
+
+            total_target = np.sum(confusion_matrix[id, :])
+            total_predicted = np.sum(confusion_matrix[:, id])
+
+            precision = float(confusion_matrix[id, id] / total_predicted)
+            recall = float(confusion_matrix[id, id] / total_target)
+            # print('precision_{}@{}IOU: {:.2f}'.format(name, IOU_THRESHOLD, precision))
+            # print('recall_{}@{}IOU: {:.2f}'.format(name, IOU_THRESHOLD, recall))
+            results.append({'category': name, 'precision_@{}IOU'.format(iou_threshold): precision,
+                            'recall_@{}IOU'.format(iou_threshold): recall})
+
+        return pd.DataFrame(results)
+
+    @staticmethod
+    def compute_iou(groundtruth_box, detection_box):
+        g_ymin, g_xmin, g_ymax, g_xmax = tuple(groundtruth_box.tolist())
+        d_ymin, d_xmin, d_ymax, d_xmax = tuple(detection_box.tolist())
+
+        xa = max(g_xmin, d_xmin)
+        ya = max(g_ymin, d_ymin)
+        xb = min(g_xmax, d_xmax)
+        yb = min(g_ymax, d_ymax)
+
+        intersection = max(0, xb - xa + 1) * max(0, yb - ya + 1)
+
+        boxAArea = (g_xmax - g_xmin + 1) * (g_ymax - g_ymin + 1)
+        boxBArea = (d_xmax - d_xmin + 1) * (d_ymax - d_ymin + 1)
+
+        return intersection / float(boxAArea + boxBArea - intersection)
 
     @staticmethod
     def save_pipeline(pipeline_dict,out_folder):

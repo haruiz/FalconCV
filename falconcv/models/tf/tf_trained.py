@@ -8,6 +8,9 @@ import numpy as np
 import tensorflow as tf
 from object_detection.utils import ops as utils_ops
 from object_detection.utils.label_map_util import create_category_index_from_labelmap
+from object_detection.core import standard_fields
+from object_detection.metrics import tf_example_parser
+from object_detection.utils import label_map_util
 
 from falconcv.decor import typeassert, pathassert
 from falconcv.models.api_model import ApiModel
@@ -108,6 +111,64 @@ class TfFreezeModel(TfTrainedModel):
         super(TfFreezeModel, self).__enter__()
         self._graph, self._session = Utilities.load_graph(self._freeze_model)
         return self
+
+    @pathassert
+    def evaluate(self, eval_record_path: typing.Union[str, Path], iou_threshold = 0.5, confidence_threshold = 0.5):
+        detections_record_path = eval_record_path.parent.joinpath("detection.record")
+        Utilities.generate_detections_record(str(eval_record_path),str(detections_record_path), self._freeze_model)
+        record_iterator = tf.python_io.tf_record_iterator(path=str(detections_record_path))
+        label_map = label_map_util.load_labelmap(self._labels_map)
+        categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=100,
+                                                                    use_display_name=True)
+        data_parser = tf_example_parser.TfExampleDetectionAndGTParser()
+        confusion_matrix = np.zeros(shape=(len(categories) + 1, len(categories) + 1))
+        image_index = 0
+        for string_record in record_iterator:
+            example = tf.train.Example()
+            example.ParseFromString(string_record)
+            decoded_dict = data_parser.parse(example)
+            image_index += 1
+            if decoded_dict:
+                groundtruth_boxes = decoded_dict[standard_fields.InputDataFields.groundtruth_boxes]
+                groundtruth_classes = decoded_dict[standard_fields.InputDataFields.groundtruth_classes]
+                detection_scores = decoded_dict[standard_fields.DetectionResultFields.detection_scores]
+                detection_classes = decoded_dict[standard_fields.DetectionResultFields.detection_classes][
+                    detection_scores >= confidence_threshold]
+                detection_boxes = decoded_dict[standard_fields.DetectionResultFields.detection_boxes][
+                    detection_scores >= confidence_threshold]
+                matches = []
+                if image_index % 100 == 0:
+                    logger.info("Processed %d images" % (image_index))
+                for i in range(len(groundtruth_boxes)):
+                    for j in range(len(detection_boxes)):
+                        iou = Utilities.compute_iou(groundtruth_boxes[i], detection_boxes[j])
+                        if iou > iou_threshold:
+                            matches.append([i, j, iou])
+                matches = np.array(matches)
+                if matches.shape[0] > 0:
+                    # Sort list of matches by descending IOU so we can remove duplicate detections
+                    # while keeping the highest IOU entry.
+                    matches = matches[matches[:, 2].argsort()[::-1][:len(matches)]]
+                    # Remove duplicate detections from the list.
+                    matches = matches[np.unique(matches[:, 1], return_index=True)[1]]
+                    # Sort the list again by descending IOU. Removing duplicates doesn't preserve
+                    # our previous sort.
+                    matches = matches[matches[:, 2].argsort()[::-1][:len(matches)]]
+                    # Remove duplicate ground truths from the list.
+                    matches = matches[np.unique(matches[:, 0], return_index=True)[1]]
+                for i in range(len(groundtruth_boxes)):
+                    if matches.shape[0] > 0 and matches[matches[:, 0] == i].shape[0] == 1:
+                        confusion_matrix[groundtruth_classes[i] - 1][
+                            detection_classes[int(matches[matches[:, 0] == i, 1][0])] - 1] += 1
+                    else:
+                        confusion_matrix[groundtruth_classes[i] - 1][confusion_matrix.shape[1] - 1] += 1
+                for i in range(len(detection_boxes)):
+                    if matches.shape[0] > 0 and matches[matches[:, 1] == i].shape[0] == 0:
+                        confusion_matrix[confusion_matrix.shape[0] - 1][detection_classes[i] - 1] += 1
+            else:
+                logger.info("Skipped image %d" % (image_index))
+        logger.info("Processed %d images" % (image_index))
+        return Utilities.confusion_matrix_to_dataframe(confusion_matrix, categories, iou_threshold)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         super(TfFreezeModel, self).__exit__(exc_type, exc_val, exc_tb)
