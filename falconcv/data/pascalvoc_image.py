@@ -299,7 +299,7 @@ class PascalVOCImage:
     @exception
     def save(self, output_path: typing.Union[Path, str], color_palette=None):
         output_path = Path(output_path)
-        assert output_path.suffix == ".jpg", "invalid file extension"
+        assert output_path.suffix.lower() == ".jpg", "invalid file extension"
         self.image_path = output_path
 
         self.xml_path = self.image_path.with_suffix(".xml")
