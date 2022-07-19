@@ -10,6 +10,7 @@ poetry.lock
 examples/
 .Python
 build/
+scripts/
 develop-eggs/
 dist/
 downloads/

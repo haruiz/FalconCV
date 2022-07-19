@@ -1,4 +1,5 @@
 import os
+import typing
 import urllib.request
 from pathlib import Path
 from urllib.error import HTTPError
@@ -6,7 +7,7 @@ from urllib.error import HTTPError
 import cv2
 import numpy as np
 import validators
-from PIL import Image
+from PIL import Image as PILImage
 
 
 class ImageUtils:
@@ -44,7 +45,7 @@ class ImageUtils:
             # image = np.asarray(bytearray(resp.read()), dtype="uint8")
             # image = cv2.imdecode(image, cv2.IMREAD_COLOR)
             # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            image = Image.open(resp).convert("RGB")
+            image = PILImage.open(resp).convert("RGB")
             image = np.asarray(image)
             return image
         except HTTPError as err:
@@ -71,20 +72,20 @@ class ImageUtils:
 
     @staticmethod
     def get_concat_h(im1, im2):
-        dst = Image.new("RGB", (im1.width + im2.width, im1.height))
+        dst = PILImage.new("RGB", (im1.width + im2.width, im1.height))
         dst.paste(im1, (0, 0))
         dst.paste(im2, (im1.width, 0))
         return dst
 
     @staticmethod
     def get_concat_v(im1, im2):
-        dst = Image.new("RGB", (im1.width, im1.height + im2.height))
+        dst = PILImage.new("RGB", (im1.width, im1.height + im2.height))
         dst.paste(im1, (0, 0))
         dst.paste(im2, (0, im1.height))
         return dst
 
     @staticmethod
-    def get_concat_h_multi_resize(im_list, resample=Image.BICUBIC):
+    def get_concat_h_multi_resize(im_list, resample=PILImage.BICUBIC):
         min_height = min(im.height for im in im_list)
         im_list_resize = [
             im.resize(
@@ -93,7 +94,7 @@ class ImageUtils:
             for im in im_list
         ]
         total_width = sum(im.width for im in im_list_resize)
-        dst = Image.new("RGB", (total_width, min_height))
+        dst = PILImage.new("RGB", (total_width, min_height))
         pos_x = 0
         for im in im_list_resize:
             dst.paste(im, (pos_x, 0))
@@ -101,7 +102,7 @@ class ImageUtils:
         return dst
 
     @staticmethod
-    def get_concat_v_multi_resize(im_list, resample=Image.BICUBIC):
+    def get_concat_v_multi_resize(im_list, resample=PILImage.BICUBIC):
         min_width = min(im.width for im in im_list)
         im_list_resize = [
             im.resize(
@@ -110,7 +111,7 @@ class ImageUtils:
             for im in im_list
         ]
         total_height = sum(im.height for im in im_list_resize)
-        dst = Image.new("RGB", (min_width, total_height))
+        dst = PILImage.new("RGB", (min_width, total_height))
         pos_y = 0
         for im in im_list_resize:
             dst.paste(im, (0, pos_y))
@@ -118,9 +119,44 @@ class ImageUtils:
         return dst
 
     @classmethod
-    def get_concat_tile_resize(cls, im_list_2d, resample=Image.BICUBIC):
+    def get_concat_tile_resize(cls, im_list_2d, resample=PILImage.BICUBIC):
         im_list_v = [
             cls.get_concat_h_multi_resize(im_list_h, resample=resample)
             for im_list_h in im_list_2d
         ]
         return cls.get_concat_v_multi_resize(im_list_v, resample=resample)
+
+    @classmethod
+    def resize_to_size(cls, image: typing.Union[np.ndarray, PILImage.Image], target_size: tuple, with_padding = False, background_color = 0):
+        image = cls.numpy_to_pillow(image)
+        in_w, in_h = image.size
+        out_w, out_h = target_size
+        padding = [0,0]
+        if in_w > in_h:
+            scale_ratio = out_w / in_w
+        else:
+            scale_ratio = out_h / in_h
+        out_image = image.resize((int(in_w * scale_ratio), int(in_h * scale_ratio)))
+        # add padding
+        in_w, in_h = out_image.size
+        if with_padding:
+            if in_w > in_h:
+                padding[1] = (in_w - in_h) // 2
+                result = PILImage.new(out_image.mode, (in_w, in_w), background_color)
+                result.paste(out_image, (0, padding[1]))
+            else:
+                padding[0] = (in_h - in_w) // 2
+                result = PILImage.new(out_image.mode, (in_h, in_h), background_color)
+                result.paste(out_image, (padding[0], 0))
+
+            if out_image.palette:
+                result.putpalette(out_image.palette)
+            out_image = result
+        return out_image, scale_ratio, padding
+
+    @classmethod
+    def numpy_to_pillow(cls, image):
+        if isinstance(image, np.ndarray):
+            image = PILImage.fromarray(image)
+        return image
+

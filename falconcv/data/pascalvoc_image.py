@@ -1,4 +1,5 @@
 import dataclasses
+import math
 import typing
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -8,7 +9,7 @@ from mako.template import Template
 
 from falconcv.decor import depends, exception
 from .pascalvoc_annotation import PascalVOCAnnotation
-from falconcv.util import TODAUtils, ColorUtils, VisUtils
+from falconcv.util import TODAUtils, ColorUtils, VisUtils, ImageUtils
 from .pascalvoc_utils import PascalVOCUtils
 from PIL import Image as PILImage
 import io
@@ -136,7 +137,7 @@ class PascalVOCImage:
     @depends("object_detection")
     def to_example_train(self, labels_map):
         assert (
-            self.image_path is not None and self.image_path.exists()
+                self.image_path is not None and self.image_path.exists()
         ), "image_path does not exist or not set"
         img_arr = self.image
         mask_arr = self.mask
@@ -212,9 +213,9 @@ class PascalVOCImage:
             encoded_mask_png_list = []
             for ann in annotations:
                 ann_mask = np.zeros_like(mask_arr)
-                ann_mask[ann.ymin : ann.ymax, ann.xmin : ann.xmax] = mask_arr[
-                    ann.ymin : ann.ymax, ann.xmin : ann.xmax
-                ]
+                ann_mask[ann.ymin: ann.ymax, ann.xmin: ann.xmax] = mask_arr[
+                                                                   ann.ymin: ann.ymax, ann.xmin: ann.xmax
+                                                                   ]
                 mask_remapped = (ann_mask == labels_map[ann.name]).astype(np.uint8)
                 mask_remapped = PILImage.fromarray(mask_remapped)
                 output = io.BytesIO()
@@ -227,15 +228,15 @@ class PascalVOCImage:
 
     @exception
     def plot(
-        self,
-        labels_map=None,
-        labels_colors_map=None,
-        figsize=None,
-        box_opacity=0.50,
-        mask_opacity=0.2,
-        fontsize=12,
-        include_labels=True,
-        matplotlib_backend="tkagg",
+            self,
+            labels_map=None,
+            labels_colors_map=None,
+            figsize=None,
+            box_opacity=0.50,
+            mask_opacity=0.2,
+            fontsize=12,
+            with_labels=True,
+            matplotlib_backend="tkagg",
     ):
         with VisUtils.with_matplotlib_backend(matplotlib_backend):
             annotations = self.annotations
@@ -265,7 +266,7 @@ class PascalVOCImage:
                     image_arr, mask_arr, labels_map, labels_colors_map, mask_opacity
                 )
 
-            if include_labels:
+            if with_labels:
                 TODAUtils.draw_labels(annotations, labels_colors_map, ax, fontsize)
 
             ax.set_axis_off()
@@ -273,6 +274,27 @@ class PascalVOCImage:
             plt.tight_layout()
             plt.show()
             return fig
+
+    @exception
+    def resize(self, target_size, with_padding=False):
+        image_arr = PILImage.open(self.image_path)
+        self.image, scale_factor, padding = ImageUtils.resize_to_size(image_arr, target_size, with_padding)
+        if self.mask_path:
+            mask_arr = PILImage.open(self.mask_path)
+            self.mask, _, _ = ImageUtils.resize_to_size(mask_arr, target_size, with_padding)
+
+        # adjust annotations
+        w, h = self.image.size
+        for ann in self.annotations:
+            ann.xmin = math.floor(ann.xmin * scale_factor) + padding[0]
+            ann.xmax = math.floor(ann.xmax * scale_factor) + padding[0]
+            ann.ymin = math.floor(ann.ymin * scale_factor) + padding[1]
+            ann.ymax = math.floor(ann.ymax * scale_factor) + padding[1]
+            bounds_constraints = [ann.xmin < 0, ann.xmax > w, ann.ymin < 0, ann.ymax > h]
+            if any(bounds_constraints):
+                raise ValueError(
+                    f"Annotation {ann} is out of bounds after resizing on image {self.image_path}"
+                )
 
     @exception
     def save(self, output_path: typing.Union[Path, str], color_palette=None):
@@ -305,3 +327,7 @@ class PascalVOCImage:
                 name=name, xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax, scale=1
             )
         )
+
+    @classmethod
+    def from_file(cls, image_path):
+        return cls(image_path=image_path, mask_path=image_path.with_suffix(".png"), xml_path=image_path.with_suffix(".xml"))
